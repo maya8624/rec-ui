@@ -12,25 +12,31 @@ interface Props {
 export const ChatLayout = ({ onClose, propertyId = null }: Props) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const { mutateAsync, isPending } = useChat();
 
   const handleSend = async (content: string) => {
+    setError(null);
     setMessages((prev) => [...prev, { role: "user", content }]);
 
-    const response = await mutateAsync({
-      Message: content,
-      PropertyId: propertyId,
-      SessionId: sessionId,
-    });
+    try {
+      const response = await mutateAsync({
+        Message: content,
+        PropertyId: propertyId,
+        SessionId: sessionId,
+      });
 
-    if (response.sessionId) {
-      setSessionId(response.sessionId);
+      if (response.sessionId) {
+        setSessionId(response.sessionId);
+      }
+
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: response.answer },
+      ]);
+    } catch {
+      setError("Failed to get a response. Please try again.");
     }
-
-    setMessages((prev) => [
-      ...prev,
-      { role: "assistant", content: response.answer },
-    ]);
   };
 
   return (
@@ -55,7 +61,7 @@ export const ChatLayout = ({ onClose, propertyId = null }: Props) => {
         )}
       </div>
 
-      <MessageList messages={messages} isLoading={isPending} />
+      <MessageList messages={messages} isLoading={isPending} error={error} />
 
       <div className="shrink-0">
         <ChatInput onSend={handleSend} disabled={isPending} />

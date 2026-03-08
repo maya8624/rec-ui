@@ -1,21 +1,14 @@
 import {api} from "../services/apiClient";
 import type { ChatRequest, ChatResponse } from "../types/chat";
 
-
-// export const sendChatmessage = async(payload: ChatRequest
-// ):Promise<ChatResponse> => {
-//     const {data} = await api.post<ChatResponse>
-//     (
-//         "/chat", 
-//         {message: payload}
-//     );
-    
-//     return data;
-// }
-
 export const sendChatmessage = async (payload: ChatRequest): Promise<ChatResponse> => {
   const res = await api.post("/chat/send-message", payload);
-  return res.data.response;
+
+  // console.log("Chat API raw response:", data);
+
+  // Handle common backend response shapes
+  // const body = data.response ?? data;
+ return res.data
 };
 
 export const getHistory = async (sessionId: string) => {

@@ -13,5 +13,5 @@ export interface ChatRequest {
 
 export interface ChatResponse {
     answer: string;
-    sessionId?: string;
+    sessionId: string | null;
 }
