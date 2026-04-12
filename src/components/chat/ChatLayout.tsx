@@ -6,12 +6,12 @@ import { ChatInput } from "./ChatInput";
 
 interface Props {
   onClose?: () => void;
-  propertyId?: number | null;
+  propertyId?: string | null;
 }
 
 export const ChatLayout = ({ onClose, propertyId = null }: Props) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [threadId, setSessionId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const { mutateAsync, isPending } = useChat();
 
@@ -21,13 +21,13 @@ export const ChatLayout = ({ onClose, propertyId = null }: Props) => {
 
     try {
       const response = await mutateAsync({
-        Message: content,
-        PropertyId: propertyId,
-        SessionId: sessionId,
+        message: content,
+        propertyId,
+        threadId,
       });
 
-      if (response.sessionId) {
-        setSessionId(response.sessionId);
+      if (response.threadId) {
+        setSessionId(response.threadId);
       }
 
       setMessages((prev) => [

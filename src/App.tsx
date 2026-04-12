@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import Header from "./components/Header";
 import ListPage from "./pages/ListPage";
 import DetailPage from "./pages/DetailPage";
+import AssistantPage from "./pages/AssistantPage";
 import { MainLayout } from "./components/chat/MainLayout";
 
 const queryClient = new QueryClient({
@@ -15,15 +15,15 @@ const queryClient = new QueryClient({
 });
 
 export default function App() {
-  // const [isChatOpen, setIsChatOpen] = useState(false);
-
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        {/* <Header /> */}
         <Routes>
+          {/* Full-screen standalone page — no Header, no chatbot button */}
+          <Route path="/assistant" element={<AssistantPage />} />
+
+          {/* Standard pages with Header + floating chatbot */}
           <Route element={<MainLayout />}>
-            {/* <Route path="/chat" element={<AssistantPage />} /> */}
             <Route path="/" element={<ListPage />} />
             <Route path="/property/:id" element={<DetailPage />} />
           </Route>

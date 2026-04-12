@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHouse, faMagnifyingGlass, faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
+import { faHouse, faMagnifyingGlass, faMoon, faSun, faRobot } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '../hooks/useTheme';
 
 export default function Header() {
@@ -39,6 +39,13 @@ export default function Header() {
             <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-red-600 text-sm font-medium no-underline">
               Sold
             </a>
+            <Link
+              to="/assistant"
+              className="flex items-center gap-1.5 text-gray-600 dark:text-gray-300 hover:text-red-600 text-sm font-medium no-underline"
+            >
+              <FontAwesomeIcon icon={faRobot} className="text-xs" />
+              AI Assistant
+            </Link>
             <button
               onClick={toggle}
               className="w-9 h-9 flex items-center justify-center rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer border-none bg-transparent"

@@ -1,5 +1,9 @@
-import { ChatLayout } from "../components/chat/ChatLayout";
+import { AssistantLayout } from '../components/assistant/AssistantLayout';
 
-export const AssistantPage = () => {
-  return <ChatLayout />;
-};
+/**
+ * Standalone full-screen page — intentionally outside MainLayout so it
+ * doesn't inherit the Header or the floating chatbot button.
+ */
+export default function AssistantPage() {
+  return <AssistantLayout />;
+}
