@@ -3,6 +3,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ListPage from "./pages/ListPage";
 import DetailPage from "./pages/DetailPage";
 import AssistantPage from "./pages/AssistantPage";
+import DepositSuccessPage from "./pages/DepositSuccessPage";
+import DepositCancelPage from "./pages/DepositCancelPage";
 import { MainLayout } from "./components/chat/MainLayout";
 
 const queryClient = new QueryClient({
@@ -26,6 +28,8 @@ export default function App() {
           <Route element={<MainLayout />}>
             <Route path="/" element={<ListPage />} />
             <Route path="/property/:id" element={<DetailPage />} />
+            <Route path="/deposit/success" element={<DepositSuccessPage />} />
+            <Route path="/deposit/cancel" element={<DepositCancelPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

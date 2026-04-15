@@ -1,17 +1,24 @@
 import { useState, useCallback } from 'react';
-import { getOrCreateThreadId, resetThreadId } from '../utils/threadStorage';
+import { getThreadId, saveThreadId, clearThreadId } from '../utils/threadStorage';
 
 interface UseThreadIdReturn {
-  threadId: string;
+  threadId: string | null;
+  setThreadId: (id: string) => void;
   resetThread: () => void;
 }
 
 export function useThreadId(): UseThreadIdReturn {
-  const [threadId, setThreadId] = useState<string>(() => getOrCreateThreadId());
+  const [threadId, setThreadIdState] = useState<string | null>(() => getThreadId());
 
-  const resetThread = useCallback(() => {
-    setThreadId(resetThreadId());
+  const setThreadId = useCallback((id: string) => {
+    saveThreadId(id);
+    setThreadIdState(id);
   }, []);
 
-  return { threadId, resetThread };
+  const resetThread = useCallback(() => {
+    clearThreadId();
+    setThreadIdState(null);
+  }, []);
+
+  return { threadId, setThreadId, resetThread };
 }

@@ -1,5 +1,6 @@
 export interface Property {
   id: number;
+  listingId?: string;
   title: string;
   address: string;
   suburb: string;

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="8" fill="#1c1c1e"/>
+  <!-- Anchor top ring -->
+  <circle cx="16" cy="9" r="2.5" fill="none" stroke="#ffffff" stroke-width="2"/>
+  <!-- Anchor vertical bar -->
+  <line x1="16" y1="11.5" x2="16" y2="24" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+  <!-- Anchor horizontal bar -->
+  <line x1="10" y1="15" x2="22" y2="15" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+  <!-- Anchor left curve -->
+  <path d="M10 20 Q8 24 11 25.5" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+  <!-- Anchor right curve -->
+  <path d="M22 20 Q24 24 21 25.5" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+  <!-- Anchor bottom arc -->
+  <path d="M11 25.5 Q16 28 21 25.5" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+</svg>

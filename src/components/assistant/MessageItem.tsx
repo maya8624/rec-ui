@@ -5,8 +5,8 @@ interface Props {
 }
 
 const AssistantAvatar = () => (
-  <div className="w-7 h-7 rounded-full bg-red-600 flex items-center justify-center shrink-0 text-white text-[10px] font-bold select-none mt-0.5">
-    AI
+  <div className="w-7 h-7 rounded-full bg-zinc-700 dark:bg-zinc-600 flex items-center justify-center shrink-0 text-white text-[10px] font-bold select-none mt-0.5">
+    H
   </div>
 );
 

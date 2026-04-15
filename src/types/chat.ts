@@ -17,11 +17,14 @@ export interface PropertyPanelData {
   properties: Property[];
 }
 
-// export interface DepositPanelData {
-//   type: 'deposit';
-//   title: string;
-//   deposits: DepositRecord[];
-// }
+export interface DepositPanelData {
+  type: 'deposit';
+  title: string;
+  propertyId: string | null;
+  listingId: string | null;
+  propertyTitle: string | null;
+  suggestedAmount: number | null;
+}
 
 // export interface BookingPanelData {
 //   type: 'booking';
@@ -30,8 +33,8 @@ export interface PropertyPanelData {
 // }
 
 export type RightPanelData =
-  | PropertyPanelData;
-  // | DepositPanelData
+  | PropertyPanelData
+  | DepositPanelData;
   // | BookingPanelData;
 
 // ── API ───────────────────────────────────────────────────────────────────────
@@ -47,7 +50,7 @@ export const chatRequestSchema = z.object({
 export type ChatRequest = z.infer<typeof chatRequestSchema>;
 
 export interface ChatResponse {
-  answer: string;
+  reply: string;
   threadId: string | null;
   /** Backend may return structured panel data alongside the text answer */
   panelData?: RightPanelData | null;

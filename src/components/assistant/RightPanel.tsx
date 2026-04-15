@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import type { RightPanelData } from '../../types/chat';
 import { PropertyResultCard } from './PropertyResultCard';
+import { DepositPanel } from '../deposit/DepositPanel';
 
 interface Props {
   data: RightPanelData;
@@ -10,7 +11,7 @@ interface Props {
 
 export const RightPanel = ({ data, onDismiss }: Props) => (
   <aside className="w-80 xl:w-96 shrink-0 flex flex-col border-l border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 overflow-hidden">
-    <header className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shrink-0">
+    <header className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1C1917] shrink-0">
       <h2 className="text-sm font-semibold text-gray-800 dark:text-white truncate">
         {data.title}
       </h2>
@@ -28,10 +29,11 @@ export const RightPanel = ({ data, onDismiss }: Props) => (
         data.properties?.map((property) => (
           <PropertyResultCard key={property.id} property={property} />
         ))}
+      {data.type === 'deposit' && <DepositPanel data={data} />}
     </div>
 
     {data.type === 'properties' && (
-      <footer className="px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shrink-0">
+      <footer className="px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1C1917] shrink-0">
         <p className="text-xs text-gray-400 dark:text-gray-500 text-center">
           {data.properties?.length ?? 0} properties · click any to view details
         </p>

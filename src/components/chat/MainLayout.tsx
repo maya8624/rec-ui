@@ -8,7 +8,7 @@ export const MainLayout = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors">
+    <div className="min-h-screen bg-gray-100 dark:bg-zinc-800 transition-colors">
       <Header />
       <main>
         <Outlet />

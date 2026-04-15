@@ -21,7 +21,7 @@ export const AssistantLayout = () => {
   } = useAssistantChat();
 
   return (
-    <div className="flex h-screen overflow-hidden bg-white dark:bg-gray-900">
+    <div className="flex h-screen overflow-hidden bg-white dark:bg-[#1C1917]">
       {/* Left sidebar — hidden below md breakpoint */}
       <div className="hidden md:flex">
         <Sidebar onNewChat={startNewChat} />

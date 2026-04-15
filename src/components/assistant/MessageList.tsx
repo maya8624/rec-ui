@@ -12,8 +12,8 @@ interface Props {
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center h-full gap-4 text-center px-4">
-      <div className="w-14 h-14 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600 font-bold text-lg select-none">
-        AI
+      <div className="w-14 h-14 rounded-full bg-zinc-700 dark:bg-zinc-600 flex items-center justify-center text-white font-bold text-lg select-none">
+        H
       </div>
       <div>
         <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-1">
@@ -72,7 +72,7 @@ export const MessageList = ({ messages, isLoading, error }: Props) => {
           {isLoading && <TypingIndicator />}
 
           {error && (
-            <p className="text-sm text-red-500 text-center py-2">{error}</p>
+            <p className="text-sm text-red-500 dark:text-red-400/70 text-center py-2">{error}</p>
           )}
 
           <div ref={bottomRef} />

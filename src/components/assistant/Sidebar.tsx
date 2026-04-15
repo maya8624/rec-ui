@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPenToSquare, faHouse } from '@fortawesome/free-solid-svg-icons';
+import { faPenToSquare, faHouse, faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
+import { useTheme } from '../../hooks/useTheme';
 
 interface Props {
   onNewChat: () => void;
@@ -15,41 +16,57 @@ const PLACEHOLDER_HISTORY: string[] = [
   'Townhouses in South Yarra',
 ];
 
-export const Sidebar = ({ onNewChat }: Props) => (
-  <aside className="w-56 xl:w-64 shrink-0 flex flex-col bg-gray-900 text-white overflow-hidden">
+export const Sidebar = ({ onNewChat }: Props) => {
+  const { isDark, toggle } = useTheme();
+
+  return (
+  <aside className="w-56 xl:w-64 shrink-0 flex flex-col bg-[#0C0A09] text-white overflow-hidden">
     {/* Brand + New Chat */}
-    <div className="px-3 py-4 space-y-2 border-b border-gray-700/50">
+    <div className="px-3 py-4 space-y-2 border-b border-stone-700/50">
       <Link
         to="/"
-        className="flex items-center gap-2 px-2 py-1.5 text-red-400 hover:text-red-300 no-underline transition-colors"
+        className="flex items-center gap-2 px-2 py-1.5 text-white hover:text-zinc-300 no-underline transition-colors"
       >
         <FontAwesomeIcon icon={faHouse} className="text-sm" />
-        <span className="text-sm font-bold tracking-tight">RealEstateHub</span>
+        <span className="text-sm font-bold tracking-tight">Harbour</span>
       </Link>
 
       <button
         onClick={onNewChat}
-        className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-gray-600 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition-colors bg-transparent cursor-pointer"
+        className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-stone-600 text-sm text-zinc-300 hover:bg-[#292524] hover:text-white transition-colors bg-transparent cursor-pointer"
       >
         <span>New chat</span>
-        <FontAwesomeIcon icon={faPenToSquare} className="text-gray-500 text-xs" />
+        <FontAwesomeIcon icon={faPenToSquare} className="text-zinc-500 text-xs" />
       </button>
     </div>
 
     {/* Recent conversations */}
     <div className="flex-1 overflow-y-auto px-2 py-3">
-      <p className="text-[10px] uppercase tracking-widest text-gray-500 px-2 mb-2 font-medium">
+      <p className="text-[10px] uppercase tracking-widest text-zinc-500 px-2 mb-2 font-medium">
         Recent
       </p>
       <ul className="space-y-0.5">
         {PLACEHOLDER_HISTORY.map((label) => (
           <li key={label}>
-            <button className="w-full text-left text-xs text-gray-400 hover:text-white hover:bg-gray-800 px-2 py-2 rounded-lg transition-colors truncate bg-transparent border-none cursor-pointer">
+            <button className="w-full text-left text-xs text-zinc-400 hover:text-white hover:bg-[#292524] px-2 py-2 rounded-lg transition-colors truncate bg-transparent border-none cursor-pointer">
               {label}
             </button>
           </li>
         ))}
       </ul>
     </div>
+
+    {/* Theme toggle */}
+    <div className="px-3 py-3 border-t border-stone-700/50">
+      <button
+        onClick={toggle}
+        aria-label="Toggle dark mode"
+        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-[#292524] transition-colors bg-transparent border-none cursor-pointer"
+      >
+        <FontAwesomeIcon icon={isDark ? faSun : faMoon} className="text-xs" />
+        <span>{isDark ? 'Light mode' : 'Dark mode'}</span>
+      </button>
+    </div>
   </aside>
-);
+  );
+};

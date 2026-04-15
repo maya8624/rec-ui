@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Message } from "../../types/chat";
 import { useChat } from "../../hooks/useChat";
+import { extractErrorMessage } from "../../utils/errorUtils";
 import { MessageList } from "./MessageList";
 import { ChatInput } from "./ChatInput";
 
@@ -32,10 +33,10 @@ export const ChatLayout = ({ onClose, propertyId = null }: Props) => {
 
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: response.answer },
+        { role: "assistant", content: response.reply },
       ]);
-    } catch {
-      setError("Failed to get a response. Please try again.");
+    } catch (err) {
+      setError(extractErrorMessage(err, "Failed to get a response. Please try again."));
     }
   };
 
