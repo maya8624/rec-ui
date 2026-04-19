@@ -1,11 +1,16 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import { BrowserRouter, Outlet, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useAuthStore } from "./store/authStore";
+import AuthGuard from "./components/AuthGuard";
+import { MainLayout } from "./components/chat/MainLayout";
 import ListPage from "./pages/ListPage";
 import DetailPage from "./pages/DetailPage";
 import AssistantPage from "./pages/AssistantPage";
 import DepositSuccessPage from "./pages/DepositSuccessPage";
 import DepositCancelPage from "./pages/DepositCancelPage";
-import { MainLayout } from "./components/chat/MainLayout";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,18 +21,31 @@ const queryClient = new QueryClient({
   },
 });
 
+function AuthInitializer() {
+  const initialize = useAuthStore((s) => s.initialize);
+  useEffect(() => { initialize(); }, [initialize]);
+  return null;
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <AuthInitializer />
         <Routes>
-          {/* Full-screen standalone page — no Header, no chatbot button */}
-          <Route path="/assistant" element={<AssistantPage />} />
+          {/* Public auth pages */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
 
-          {/* Standard pages with Header + floating chatbot */}
+          {/* Public pages — Header + floating chatbot */}
           <Route element={<MainLayout />}>
             <Route path="/" element={<ListPage />} />
             <Route path="/property/:id" element={<DetailPage />} />
+          </Route>
+
+          {/* Protected pages */}
+          <Route element={<AuthGuard><Outlet /></AuthGuard>}>
+            <Route path="/assistant" element={<AssistantPage />} />
             <Route path="/deposit/success" element={<DepositSuccessPage />} />
             <Route path="/deposit/cancel" element={<DepositCancelPage />} />
           </Route>

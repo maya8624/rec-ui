@@ -3,7 +3,6 @@ import { useMutation } from '@tanstack/react-query';
 import { sendChatmessage } from '../api/chatApi';
 import { detectPanelData } from '../utils/chatPanelUtils';
 import { extractErrorMessage } from '../utils/errorUtils';
-import { useThreadId } from './useThreadId';
 import type { Message, ChatRequest, RightPanelData } from '../types/chat';
 
 interface UseAssistantChatReturn {
@@ -17,7 +16,7 @@ interface UseAssistantChatReturn {
 }
 
 export function useAssistantChat(): UseAssistantChatReturn {
-  const { threadId, setThreadId, resetThread } = useThreadId();
+  const [threadId, setThreadId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [rightPanelData, setRightPanelData] = useState<RightPanelData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -47,7 +46,6 @@ export function useAssistantChat(): UseAssistantChatReturn {
           { role: 'assistant', content: response.reply },
         ]);
 
-        // Backend panelData takes precedence; fall back to client-side detection
         const panel = response.panelData ?? detectPanelData(content);
         if (panel) {
           setRightPanelData(panel);
@@ -56,17 +54,17 @@ export function useAssistantChat(): UseAssistantChatReturn {
         setError(extractErrorMessage(err, 'Failed to get a response. Please try again.'));
       }
     },
-    [mutateAsync, threadId, setThreadId],
+    [mutateAsync, threadId],
   );
 
   const dismissRightPanel = useCallback(() => setRightPanelData(null), []);
 
   const startNewChat = useCallback(() => {
-    resetThread();
+    setThreadId(null);
     setMessages([]);
     setRightPanelData(null);
     setError(null);
-  }, [resetThread]);
+  }, []);
 
   return {
     messages,
