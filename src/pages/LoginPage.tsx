@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuthStore } from "../store/authStore";
+import { useQueryClient } from "@tanstack/react-query";
+import { loginApi, externalLoginApi } from "../api/authApi";
+import { currentUserQueryKey } from "../hooks/useCurrentUser";
 import type { ErrorResponse } from "../types/auth";
 import type { AxiosError } from "axios";
 
@@ -16,7 +18,7 @@ declare const google: {
 };
 
 export default function LoginPage() {
-    const { login, loginWithGoogle } = useAuthStore();
+    const queryClient = useQueryClient();
     const navigate = useNavigate();
     const location = useLocation();
     const from = (location.state as { from?: Location })?.from?.pathname ?? "/";
@@ -38,7 +40,8 @@ export default function LoginPage() {
                 setIsGoogleLoading(true);
                 setError(null);
                 try {
-                    await loginWithGoogle(credential);
+                    await externalLoginApi("google", credential);
+                    await queryClient.invalidateQueries({ queryKey: currentUserQueryKey });
                     navigate(from, { replace: true });
                 } catch {
                     setError("Google sign-in failed. Please try again.");
@@ -60,7 +63,8 @@ export default function LoginPage() {
         setIsLoading(true);
         setError(null);
         try {
-            await login(email, password);
+            await loginApi(email, password);
+            await queryClient.invalidateQueries({ queryKey: currentUserQueryKey });
             navigate(from, { replace: true });
         } catch (err) {
             const axiosErr = err as AxiosError<ErrorResponse>;

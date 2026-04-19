@@ -1,5 +1,7 @@
 import axios from "axios";
 import { config } from "../config/config";
+import { queryClient } from "../lib/queryClient";
+import { logoutApi } from "../api/authApi";
 
 export const api = axios.create({
     baseURL: config.apiBaseUrl || "/api",
@@ -11,12 +13,12 @@ export const api = axios.create({
 
 api.interceptors.response.use(
     (response) => response,
-    (error) => {
-        if (error.response?.status === 401) {
-            // Avoid circular import — access store dynamically
-            import("../store/authStore").then(({ useAuthStore }) => {
-                useAuthStore.getState().logout();
-            });
+    async (error) => {
+        const url: string = error.config?.url ?? "";
+        const isAuthEndpoint = url.startsWith("/auth/");
+        if (error.response?.status === 401 && !isAuthEndpoint) {
+            await logoutApi();
+            queryClient.setQueryData(["auth", "me"], null);
         }
         return Promise.reject(error);
     }

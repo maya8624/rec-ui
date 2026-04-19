@@ -1,11 +1,11 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { useAuthStore } from "../store/authStore";
+import { useCurrentUser } from "../hooks/useCurrentUser";
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
-    const { isAuthenticated, isInitializing } = useAuthStore();
+    const { data: user, isLoading } = useCurrentUser();
     const location = useLocation();
 
-    if (isInitializing) {
+    if (isLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <svg className="animate-spin h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24">
@@ -16,7 +16,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         );
     }
 
-    if (!isAuthenticated) {
+    if (!user) {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 

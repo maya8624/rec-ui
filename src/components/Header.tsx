@@ -1,10 +1,15 @@
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHouse, faMagnifyingGlass, faMoon, faSun, faRobot } from '@fortawesome/free-solid-svg-icons';
+import { faHouse, faMagnifyingGlass, faMoon, faSun, faRobot, faUser } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '../hooks/useTheme';
+import { useCurrentUser } from '../hooks/useCurrentUser';
+import { useLogout } from '../hooks/useLogout';
 
 export default function Header() {
   const { isDark, toggle } = useTheme();
+  const { data: user } = useCurrentUser();
+  const logout = useLogout();
+  const username = user?.firstName ?? user?.email.split("@")[0];
 
   return (
     <header className="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50 transition-colors">
@@ -46,6 +51,20 @@ export default function Header() {
               <FontAwesomeIcon icon={faRobot} className="text-xs" />
               AI Assistant
             </Link>
+            {user && username && (
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-300">
+                  <FontAwesomeIcon icon={faUser} className="text-xs" />
+                  <span>{username}</span>
+                </div>
+                <button
+                  onClick={() => logout()}
+                  className="text-xs text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors cursor-pointer border-none bg-transparent"
+                >
+                  Sign out
+                </button>
+              </div>
+            )}
             <button
               onClick={toggle}
               className="w-9 h-9 flex items-center justify-center rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer border-none bg-transparent"

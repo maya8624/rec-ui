@@ -1,7 +1,6 @@
-import { useEffect } from "react";
 import { BrowserRouter, Outlet, Routes, Route } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useAuthStore } from "./store/authStore";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./lib/queryClient";
 import AuthGuard from "./components/AuthGuard";
 import { MainLayout } from "./components/chat/MainLayout";
 import ListPage from "./pages/ListPage";
@@ -12,26 +11,11 @@ import DepositCancelPage from "./pages/DepositCancelPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
-
-function AuthInitializer() {
-  const initialize = useAuthStore((s) => s.initialize);
-  useEffect(() => { initialize(); }, [initialize]);
-  return null;
-}
 
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AuthInitializer />
         <Routes>
           {/* Public auth pages */}
           <Route path="/login" element={<LoginPage />} />

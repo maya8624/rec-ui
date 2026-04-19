@@ -1,7 +1,9 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPenToSquare, faHouse, faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
+import { faPenToSquare, faHouse, faMoon, faSun, faUser } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../../hooks/useTheme';
+import { useCurrentUser } from '../../hooks/useCurrentUser';
+import { useLogout } from '../../hooks/useLogout';
 
 interface Props {
   onNewChat: () => void;
@@ -18,6 +20,9 @@ const PLACEHOLDER_HISTORY: string[] = [
 
 export const Sidebar = ({ onNewChat }: Props) => {
   const { isDark, toggle } = useTheme();
+  const { data: user } = useCurrentUser();
+  const logout = useLogout();
+  const username = user?.firstName ?? user?.email.split("@")[0];
 
   return (
   <aside className="w-56 xl:w-64 shrink-0 flex flex-col bg-[#0C0A09] text-white overflow-hidden">
@@ -55,6 +60,24 @@ export const Sidebar = ({ onNewChat }: Props) => {
         ))}
       </ul>
     </div>
+
+    {/* User + sign out */}
+    {username && (
+      <div className="px-3 py-3 border-t border-stone-700/50 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="w-6 h-6 rounded-full bg-stone-600 flex items-center justify-center shrink-0">
+            <FontAwesomeIcon icon={faUser} className="text-[10px] text-zinc-300" />
+          </div>
+          <span className="text-xs text-zinc-300 truncate">{username}</span>
+        </div>
+        <button
+          onClick={() => logout()}
+          className="text-[11px] text-zinc-500 hover:text-white transition-colors bg-transparent border-none cursor-pointer shrink-0"
+        >
+          Sign out
+        </button>
+      </div>
+    )}
 
     {/* Theme toggle */}
     <div className="px-3 py-3 border-t border-stone-700/50">

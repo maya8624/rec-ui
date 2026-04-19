@@ -1,13 +1,13 @@
 # Auth — Frontend Integration Reference
 
-**API base URL (dev):** `http://localhost:5173` proxied to `https://localhost:7289`  
-**All requests must include:** `credentials: "include"` (cookie-based auth)
+**API base URL (dev):** `https://localhost:7289`  
+**All requests must include:** `withCredentials: true` (cookie-based auth)
 
 ---
 
 ## How Auth Works
 
-The API uses **HttpOnly cookies** — the frontend never touches the JWT directly. After any successful login/register, the server sets a `__Host-Nexus-Auth` cookie automatically. Every subsequent request sends this cookie automatically as long as `credentials: "include"` is set.
+The API uses **HttpOnly cookies** — the frontend never touches the JWT directly. After any successful login/register, the server sets a `__Host-Nexus-Auth` cookie automatically. Every subsequent request sends this cookie automatically as long as `withCredentials: true` is set on the axios instance.
 
 ```
 Client                          API
@@ -23,29 +23,57 @@ Client                          API
 
 ---
 
+## UserResponse
+
+All auth endpoints return a consistent `UserResponse` shape:
+
+```json
+{
+  "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "email": "user@example.com",
+  "firstName": "Maya",
+  "lastName": "Smith"
+}
+```
+
+> `firstName` and `lastName` are **nullable** — email-registered users without a name return `null` until their profile is updated. Google OAuth users always have names populated from their Google account.
+
+---
+
 ## Endpoints
 
 ### POST `/api/auth/register`
 
-Register a new user with email and password. Auto-logs in on success (sets cookie).
+Register a new user. Auto-logs in on success (sets cookie).
 
 **Request**
 ```json
 {
   "email": "user@example.com",
-  "password": "secret123"
+  "password": "secret123",
+  "firstName": "Maya",
+  "lastName": "Smith"
 }
 ```
+
+| Field | Validation |
+|-------|-----------|
+| `email` | Required, valid email format |
+| `password` | Required, min 6 characters |
+| `firstName` | Optional, max 100 chars |
+| `lastName` | Optional, max 100 chars |
 
 **Success — `201 Created`**
 ```json
 {
   "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "email": "user@example.com"
+  "email": "user@example.com",
+  "firstName": "Maya",
+  "lastName": "Smith"
 }
 ```
 
-**Failure — `409 Conflict`** (email already registered)
+**Failure — `409 Conflict`**
 ```json
 {
   "code": 409,
@@ -72,7 +100,9 @@ Login with email and password. Sets cookie on success.
 ```json
 {
   "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "email": "user@example.com"
+  "email": "user@example.com",
+  "firstName": "Maya",
+  "lastName": "Smith"
 }
 ```
 
@@ -89,7 +119,7 @@ Login with email and password. Sets cookie on success.
 
 ### POST `/api/auth/external-login`
 
-Login or register via an external OAuth provider (currently: Google). Sets cookie on success.
+Login or register via an external OAuth provider. Currently **Google only** — Microsoft is a stub, not yet implemented.
 
 **Request**
 ```json
@@ -103,7 +133,9 @@ Login or register via an external OAuth provider (currently: Google). Sets cooki
 ```json
 {
   "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "email": "user@example.com"
+  "email": "user@example.com",
+  "firstName": "Maya",
+  "lastName": "Smith"
 }
 ```
 
@@ -111,16 +143,22 @@ Login or register via an external OAuth provider (currently: Google). Sets cooki
 ```json
 {
   "code": 401,
-  "name": "GOOGLE_TOKEN_INVALID",
-  "message": "Google token is expired or has an invalid signature"
+  "name": "GOOGLE_TOKEN_INVALID" | "GOOGLE_AUTH_FAILED" | "GOOGLE_AUTH_ERROR",
+  "message": "..."
 }
 ```
+
+| `name` | Cause |
+|--------|-------|
+| `GOOGLE_TOKEN_INVALID` | Token expired or invalid signature |
+| `GOOGLE_AUTH_FAILED` | Google email not verified |
+| `GOOGLE_AUTH_ERROR` | Network or upstream Google error |
 
 ---
 
 ### POST `/api/auth/logout`
 
-Clears the auth cookie. No request body needed.
+Deletes the auth cookie. No request body needed.
 
 **Success — `200 OK`** (empty body)
 
@@ -128,13 +166,17 @@ Clears the auth cookie. No request body needed.
 
 ### GET `/api/auth/me`
 
-Returns the currently authenticated user. Use this on app load to rehydrate auth state.
+Returns the currently authenticated user from JWT claims — **no database hit**. Use this on app load to rehydrate auth state.
+
+> Because names are stored as JWT claims (`given_name`, `family_name`), `GET /me` reflects the name at the time of login. If a user updates their name after logging in, the JWT will carry the old value until they re-authenticate.
 
 **Success — `200 OK`**
 ```json
 {
   "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "email": "user@example.com"
+  "email": "user@example.com",
+  "firstName": "Maya",
+  "lastName": "Smith"
 }
 ```
 
@@ -174,54 +216,12 @@ useEffect(() => {
 
 ```tsx
 async function handleGoogleCredential(response: google.accounts.id.CredentialResponse) {
-  const res = await fetch("/api/auth/external-login", {
-    method: "POST",
-    credentials: "include",         // required — sends/receives cookie
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      provider: "google",
-      idToken: response.credential, // the JWT from Google
-    }),
+  const res = await api.post("/auth/external-login", {
+    provider: "google",
+    idToken: response.credential,
   });
-
-  if (!res.ok) {
-    const err = await res.json();
-    // err.name === "GOOGLE_TOKEN_INVALID" | "GOOGLE_AUTH_FAILED" | "GOOGLE_AUTH_ERROR"
-    return;
-  }
-
-  const user = await res.json(); // { userId, email }
-  // store user in state / context
+  // res.data → { userId, email, firstName, lastName }
 }
-```
-
----
-
-## Email Auth — Fetch Examples
-
-```tsx
-// Register
-const res = await fetch("/api/auth/register", {
-  method: "POST",
-  credentials: "include",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ email, password }),
-});
-
-// Login
-const res = await fetch("/api/auth/login", {
-  method: "POST",
-  credentials: "include",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ email, password }),
-});
-
-// Logout
-await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
-
-// Get current user (on app load)
-const res = await fetch("/api/auth/me", { credentials: "include" });
-if (res.status === 401) { /* not logged in */ }
 ```
 
 ---
@@ -255,12 +255,24 @@ type ErrorResponse = {
 | HttpOnly | Yes — JS cannot read it |
 | Secure | Yes — HTTPS only |
 | SameSite | Strict |
-| Expiry | 5 min (known issue — token is valid 2h, cookie expires early; fix pending) |
+| Expiry | 5 min (**known issue** — token is valid 2h, cookie expires early; fix pending) |
 
-> **Known issue:** The cookie expires in 5 minutes but the JWT is valid for 2 hours. Until the refresh token is implemented, users may get logged out early. Re-calling `GET /api/auth/me` after a 401 won't help — the client must re-authenticate.
+---
+
+## Known Issues & Pending Work
+
+| Issue | Severity | Status |
+|-------|----------|--------|
+| Cookie expiry 5 min vs token 2h — premature logout | Medium | Pending — align `CookieOptions.Expires` with token lifetime |
+| Google OAuth secret in `appsettings.Development.json` | High | Move to `dotnet user-secrets` / Azure Key Vault |
+| JWT symmetric key in `appsettings.Development.json` | High | Same as above |
+| No rate limiting on `/login` and `/register` | Medium | Pending |
+| No account lockout on failed logins | Medium | Pending |
+| No email verification on register | Medium | Pending |
+| Microsoft OAuth — stub only, not implemented | — | Implement when required |
 
 ---
 
 ## Protected Routes
 
-Every endpoint except `/api/auth/external-login` requires the cookie. A missing or expired cookie returns `401` with no body. Redirect the user to the login page on any `401` from a non-auth endpoint.
+Every endpoint except `/api/auth/*` requires the cookie. A missing or expired cookie returns `401` with no body. The frontend axios interceptor catches this and calls `logout()` automatically — redirecting the user to `/login`.
