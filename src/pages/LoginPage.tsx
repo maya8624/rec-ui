@@ -30,24 +30,24 @@ export default function LoginPage() {
     const [error, setError] = useState<string | null>(null);
 
     const googleBtnRef = useRef<HTMLDivElement>(null);
+    const googleInitialized = useRef(false);
 
     useEffect(() => {
-        if (typeof google === "undefined" || !googleBtnRef.current) return;
+        if (typeof google === "undefined" || !googleBtnRef.current || googleInitialized.current) return;
+        googleInitialized.current = true;
 
         google.accounts.id.initialize({
             client_id: GOOGLE_CLIENT_ID,
-            callback: async ({ credential }) => {
+            callback: ({ credential }) => {
                 setIsGoogleLoading(true);
                 setError(null);
-                try {
-                    await externalLoginApi("google", credential);
-                    await queryClient.invalidateQueries({ queryKey: currentUserQueryKey });
-                    navigate(from, { replace: true });
-                } catch {
-                    setError("Google sign-in failed. Please try again.");
-                } finally {
-                    setIsGoogleLoading(false);
-                }
+                externalLoginApi("google", credential)
+                    .then((user) => {
+                        queryClient.setQueryData(currentUserQueryKey, user);
+                        navigate(from, { replace: true });
+                    })
+                    .catch(() => setError("Google sign-in failed. Please try again."))
+                    .finally(() => setIsGoogleLoading(false));
             },
         });
 
@@ -63,8 +63,8 @@ export default function LoginPage() {
         setIsLoading(true);
         setError(null);
         try {
-            await loginApi(email, password);
-            await queryClient.invalidateQueries({ queryKey: currentUserQueryKey });
+            const user = await loginApi(email, password);
+            queryClient.setQueryData(currentUserQueryKey, user);
             navigate(from, { replace: true });
         } catch (err) {
             const axiosErr = err as AxiosError<ErrorResponse>;
