@@ -2,7 +2,7 @@ import { BrowserRouter, Outlet, Routes, Route } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import AuthGuard from "./components/AuthGuard";
-import { MainLayout } from "./components/chat/MainLayout";
+import { MainLayout } from "./components/layout/MainLayout";
 import ListPage from "./pages/ListPage";
 import DetailPage from "./pages/DetailPage";
 import AssistantPage from "./pages/AssistantPage";

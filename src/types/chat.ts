@@ -52,6 +52,7 @@ export type ChatRequest = z.infer<typeof chatRequestSchema>;
 export interface ChatResponse {
   reply: string;
   threadId: string | null;
+  propertyId?: string | null;
   /** Backend may return structured panel data alongside the text answer */
   panelData?: RightPanelData | null;
 }

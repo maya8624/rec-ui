@@ -17,6 +17,7 @@ interface UseAssistantChatReturn {
 
 export function useAssistantChat(): UseAssistantChatReturn {
   const [threadId, setThreadId] = useState<string | null>(null);
+  const [propertyId, setPropertyId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [rightPanelData, setRightPanelData] = useState<RightPanelData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -33,12 +34,16 @@ export function useAssistantChat(): UseAssistantChatReturn {
       try {
         const response = await mutateAsync({
           message: content,
-          propertyId: null,
+          propertyId,
           threadId,
         });
 
         if (response.threadId) {
           setThreadId(response.threadId);
+        }
+
+        if (response.propertyId !== undefined) {
+          setPropertyId(response.propertyId ?? null);
         }
 
         setMessages((prev) => [
@@ -54,13 +59,14 @@ export function useAssistantChat(): UseAssistantChatReturn {
         setError(extractErrorMessage(err, 'Failed to get a response. Please try again.'));
       }
     },
-    [mutateAsync, threadId],
+    [mutateAsync, threadId, propertyId],
   );
 
   const dismissRightPanel = useCallback(() => setRightPanelData(null), []);
 
   const startNewChat = useCallback(() => {
     setThreadId(null);
+    setPropertyId(null);
     setMessages([]);
     setRightPanelData(null);
     setError(null);
