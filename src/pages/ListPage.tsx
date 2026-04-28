@@ -7,9 +7,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSliders } from '@fortawesome/free-solid-svg-icons';
 
 export default function ListPage() {
-  const [selectedType, setSelectedType] = useState<
-    Property['propertyType'] | null
-  >(null);
+  const [selectedType, setSelectedType] = useState<Property['propertyType'] | null>(null);
+  const [listingType, setListingType] = useState<Property['listingType'] | null>(null);
 
   const {
     data,
@@ -18,7 +17,7 @@ export default function ListPage() {
     isFetchingNextPage,
     isLoading,
     isError,
-  } = useInfiniteProperties(selectedType ?? undefined);
+  } = useInfiniteProperties(selectedType ?? undefined, listingType ?? undefined);
 
   const observerRef = useRef<IntersectionObserver | null>(null);
 
@@ -54,22 +53,43 @@ export default function ListPage() {
     };
   }, []);
 
-  const allProperties = data?.pages.flatMap((page) => page.properties) ?? [];
-  const total = data?.pages[0]?.total ?? 0;
+  const allProperties = data?.pages.flatMap((page) => page.items ?? []) ?? [];
+  const total = data?.pages[0]?.totalCount ?? 0;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       {/* Page Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
-          Properties for Sale
+          {listingType === 'Sale' ? 'Properties for Sale' : listingType === 'Rent' ? 'Properties for Rent' : 'All Properties'}
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400">
           {total > 0 && `${total} properties found`}
         </p>
       </div>
 
-      {/* Filters Bar */}
+      {/* Buy / Rent toggle */}
+      <div className="flex items-center gap-2 mb-4">
+        {([null, 'Sale', 'Rent'] as const).map((type) => {
+          const label = type === null ? 'All' : type === 'Sale' ? 'Buy' : 'Rent';
+          const isActive = listingType === type;
+          return (
+            <button
+              key={label}
+              onClick={() => setListingType(type)}
+              className={`px-5 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer border ${
+                isActive
+                  ? 'bg-red-600 text-white border-red-600'
+                  : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-red-500 hover:text-red-600'
+              }`}
+            >
+              {label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Property type filters */}
       <div className="flex items-center gap-3 mb-6 flex-wrap">
         <button className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:border-red-500 hover:text-red-600 transition-colors cursor-pointer">
           <FontAwesomeIcon icon={faSliders} />
@@ -85,26 +105,22 @@ export default function ListPage() {
         >
           All
         </button>
-        {(['House', 'Apartment', 'Townhouse', 'Villa', 'Land'] as const).map(
-          (type) => {
-            const isActive = selectedType === type;
-            return (
-              <button
-                key={type}
-                onClick={() =>
-                  setSelectedType(isActive ? null : type)
-                }
-                className={`px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer border ${
-                  isActive
-                    ? 'bg-red-600 text-white border-red-600 dark:bg-red-600 dark:text-white dark:border-red-600'
-                    : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-red-500 hover:text-red-600'
-                }`}
-              >
-                {type}
-              </button>
-            );
-          }
-        )}
+        {(['House', 'Apartment', 'Townhouse', 'Villa', 'Land'] as const).map((type) => {
+          const isActive = selectedType === type;
+          return (
+            <button
+              key={type}
+              onClick={() => setSelectedType(isActive ? null : type)}
+              className={`px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer border ${
+                isActive
+                  ? 'bg-red-600 text-white border-red-600 dark:bg-red-600 dark:text-white dark:border-red-600'
+                  : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-red-500 hover:text-red-600'
+              }`}
+            >
+              {type}
+            </button>
+          );
+        })}
       </div>
 
       {/* Error State */}

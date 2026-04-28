@@ -3,19 +3,20 @@ import { propertyApi } from '../api/propertyApi';
 import type { Property } from '../types/property';
 
 export function useInfiniteProperties(
-  propertyType?: Property['propertyType']
+  propertyType?: Property['propertyType'],
+  listingType?: Property['listingType']
 ) {
   return useInfiniteQuery({
-    queryKey: ['properties', { propertyType }],
+    queryKey: ['properties', { propertyType, listingType }],
     queryFn: ({ pageParam }) =>
-      propertyApi.getProperties(pageParam, propertyType),
+      propertyApi.getProperties(pageParam, propertyType, listingType),
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>
-      lastPage.hasMore ? lastPage.page + 1 : undefined,
+      lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
   });
 }
 
-export function useProperty(id: number) {
+export function useProperty(id: string) {
   return useQuery({
     queryKey: ['property', id],
     queryFn: () => propertyApi.getPropertyById(id),

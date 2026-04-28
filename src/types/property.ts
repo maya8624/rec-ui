@@ -1,6 +1,5 @@
 export interface Property {
-  id: number;
-  listingId?: string;
+  id: string;
   title: string;
   address: string;
   suburb: string;
@@ -20,8 +19,9 @@ export interface Property {
     name: string;
     phone: string;
     agency: string;
-    photo: string;
+    photo?: string;
   };
+  listingType?: 'Sale' | 'Rent';
   auctionDate: string | null;
   isNew: boolean;
   isFeatured: boolean;
@@ -30,9 +30,9 @@ export interface Property {
 }
 
 export interface PropertiesResponse {
-  properties: Property[];
-  total: number;
+  items: Property[];
   page: number;
   pageSize: number;
-  hasMore: boolean;
+  totalCount: number;
+  totalPages: number;
 }

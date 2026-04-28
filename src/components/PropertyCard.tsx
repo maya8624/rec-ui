@@ -113,12 +113,14 @@ export default function PropertyCard({ property }: PropertyCardProps) {
 
           {/* Agent */}
           <div className="flex items-center gap-3 border-t border-gray-100 dark:border-gray-700 pt-3">
-            <img
-              src={property.agent.photo}
-              alt={property.agent.name}
-              className="w-9 h-9 rounded-full object-cover"
-              loading="lazy"
-            />
+            {property.agent.photo && (
+              <img
+                src={property.agent.photo}
+                alt={property.agent.name}
+                className="w-9 h-9 rounded-full object-cover"
+                loading="lazy"
+              />
+            )}
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">
                 {property.agent.name}

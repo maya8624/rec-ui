@@ -168,7 +168,7 @@ function generateProperties(): Property[] {
     }
 
     properties.push({
-      id: i,
+      id: String(i),
       title: `${bedrooms > 0 ? bedrooms + ' Bedroom ' : ''}${type} in ${suburb.name}`,
       address: `${streetNumber} ${streetName} ${streetType}`,
       suburb: suburb.name,

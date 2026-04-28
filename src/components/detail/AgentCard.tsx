@@ -6,7 +6,7 @@ interface AgentCardProps {
     name: string;
     phone: string;
     agency: string;
-    photo: string;
+    photo?: string;
   };
   listedDate: string;
 }
@@ -15,11 +15,13 @@ export default function AgentCard({ agent, listedDate }: AgentCardProps) {
   return (
     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 sticky top-24">
       <div className="text-center mb-4">
-        <img
-          src={agent.photo}
-          alt={agent.name}
-          className="w-20 h-20 rounded-full mx-auto mb-3 object-cover"
-        />
+        {agent.photo && (
+          <img
+            src={agent.photo}
+            alt={agent.name}
+            className="w-20 h-20 rounded-full mx-auto mb-3 object-cover"
+          />
+        )}
         <h3 className="font-semibold text-gray-900 dark:text-white">
           {agent.name}
         </h3>

@@ -2,6 +2,7 @@ import { properties } from '../data/properties';
 import type { PropertyPanelData, DepositPanelData } from '../types/chat';
 import type { Property } from '../types/property';
 
+
 const PROPERTY_INTENT_KEYWORDS = [
   'show', 'list', 'find', 'search', 'browse',
   'properties', 'houses', 'apartments', 'townhouses', 'listings',
@@ -67,6 +68,10 @@ export function detectPanelData(userMessage: string): PropertyPanelData | Deposi
   return {
     type: 'properties' as const,
     title: propertyType ? `${propertyType}s for Sale` : 'Properties for Sale',
-    properties: filtered.slice(0, MAX_PANEL_RESULTS),
+    properties: filtered.slice(0, MAX_PANEL_RESULTS).map((p) => ({
+      propertyId: String(p.id),
+      propertyUrl: `/property/${p.id}`,
+      listingId: String(p.id),
+    })),
   };
 }

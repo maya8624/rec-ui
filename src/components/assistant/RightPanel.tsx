@@ -26,8 +26,8 @@ export const RightPanel = ({ data, onDismiss }: Props) => (
 
     <div className="flex-1 overflow-y-auto p-3 space-y-3">
       {data.type === 'properties' &&
-        data.properties?.map((property) => (
-          <PropertyResultCard key={property.id} property={property} />
+        data.properties?.map((listing) => (
+          <PropertyResultCard key={listing.listingId} listing={listing} />
         ))}
       {data.type === 'deposit' && <DepositPanel data={data} />}
     </div>

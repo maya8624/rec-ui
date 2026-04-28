@@ -1,11 +1,15 @@
-import type { Property } from './property';
-
 export type UserRole = "buyer" | "seller" | "agent";
 
 export type Message = {
   role: "user" | "assistant";
   content: string;
 };
+
+export interface PropertyListing {
+  propertyId: string;
+  propertyUrl: string;
+  listingId: string;
+}
 
 // ── Right panel ──────────────────────────────────────────────────────────────
 // Discriminated union — add new panel variants here as the backend supports them.
@@ -14,7 +18,7 @@ export type Message = {
 export interface PropertyPanelData {
   type: 'properties';
   title: string;
-  properties: Property[];
+  properties: PropertyListing[];
 }
 
 export interface DepositPanelData {
@@ -53,6 +57,5 @@ export interface ChatResponse {
   reply: string;
   threadId: string | null;
   propertyId?: string | null;
-  /** Backend may return structured panel data alongside the text answer */
-  panelData?: RightPanelData | null;
+  listings?: PropertyListing[] | null;
 }

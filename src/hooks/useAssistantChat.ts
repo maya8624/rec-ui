@@ -51,7 +51,10 @@ export function useAssistantChat(): UseAssistantChatReturn {
           { role: 'assistant', content: response.reply },
         ]);
 
-        const panel = response.panelData ?? detectPanelData(content);
+        const panel: RightPanelData | null =
+          response.listings?.length
+            ? { type: 'properties', title: 'Properties for Sale', properties: response.listings }
+            : detectPanelData(content);
         if (panel) {
           setRightPanelData(panel);
         }

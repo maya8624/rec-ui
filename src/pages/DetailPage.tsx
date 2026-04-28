@@ -16,7 +16,7 @@ import AgentCard from '../components/detail/AgentCard';
 
 export default function DetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { data: property, isLoading, isError } = useProperty(Number(id));
+  const { data: property, isLoading, isError } = useProperty(id!);
 
   if (isLoading) {
     return <DetailPageSkeleton />;
