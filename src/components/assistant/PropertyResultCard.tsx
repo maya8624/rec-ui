@@ -29,6 +29,8 @@ export const PropertyResultCard = ({ listing }: Props) => {
   return (
     <Link
       to={`/property/${property.id}`}
+      target="property-detail"
+      rel="noopener noreferrer"
       className="block no-underline bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden hover:shadow-md hover:border-red-300 dark:hover:border-red-700 transition-all"
     >
       {property.images[0] && (
