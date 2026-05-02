@@ -1,4 +1,8 @@
 {
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/assets/*", "/*.{js,css,ico,png,svg,jpg,jpeg,gif,webp}"]
+  },
   "globalHeaders": {
     "content-type": "text/html; charset=utf-8"
   }
