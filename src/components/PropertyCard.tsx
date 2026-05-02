@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { formatPrice } from '../utils/formatPrice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBed, faBath, faCar, faRulerCombined, faGavel, faPhone } from '@fortawesome/free-solid-svg-icons';
 import { faHeart } from '@fortawesome/free-regular-svg-icons';
@@ -62,7 +63,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
         <div className="p-4">
           {/* Price */}
           <div className="text-xl font-bold text-gray-900 dark:text-white mb-1">
-            {property.price}
+            {formatPrice(property)}
           </div>
 
           {/* Auction date */}

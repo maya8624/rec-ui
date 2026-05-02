@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBed, faBath, faCar } from '@fortawesome/free-solid-svg-icons';
 import type { PropertyListing } from '../../types/chat';
+import { formatPrice } from '../../utils/formatPrice';
 import { useProperty } from '../../hooks/useProperties';
 
 interface Props {
@@ -48,7 +49,7 @@ export const PropertyResultCard = ({ listing }: Props) => {
       )}
 
       <div className="p-3">
-        <p className="font-bold text-sm text-red-600 mb-0.5">{property.price}</p>
+        <p className="font-bold text-sm text-red-600 mb-0.5">{formatPrice(property)}</p>
         <p className="text-sm font-medium text-gray-900 dark:text-white truncate leading-snug">
           {property.address}
         </p>

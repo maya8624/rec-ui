@@ -5,7 +5,6 @@ export interface Property {
   suburb: string;
   state: string;
   postcode: string;
-  price: string;
   priceValue: number;
   propertyType: 'House' | 'Apartment' | 'Townhouse' | 'Villa' | 'Land';
   bedrooms: number;
