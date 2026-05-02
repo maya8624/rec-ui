@@ -1,4 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
+import { formatPrice } from '../utils/formatPrice';
 import { useProperty } from '../hooks/useProperties';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -57,7 +58,7 @@ export default function DetailPage() {
           <div className="mb-6">
             <div className="flex items-start justify-between gap-4 mb-2">
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                {property.price}
+                {formatPrice(property)}
               </h1>
               <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:border-red-500 hover:text-red-600 transition-colors cursor-pointer bg-white dark:bg-gray-800">
                 <FontAwesomeIcon icon={faHeart} />
