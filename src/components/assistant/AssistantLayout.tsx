@@ -1,46 +1,101 @@
-import { useAssistantChat } from '../../hooks/useAssistantChat';
-import { Sidebar } from './Sidebar';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPenToSquare, faHouse, faMoon, faSun, faUser } from '@fortawesome/free-solid-svg-icons';
+import { Link } from 'react-router-dom';
+import { useTheme } from '../../hooks/useTheme';
+import { useCurrentUser } from '../../hooks/useCurrentUser';
+import { useLogout } from '../../hooks/useLogout';
+import { useAssistantChatStream } from '../../hooks/useAssistantChatStream';
 import { ConversationPanel } from './ConversationPanel';
 import { RightPanel } from './RightPanel';
 
-/**
- * Three-zone Claude-style layout:
- *   [Sidebar (hidden on mobile)] | [ConversationPanel] | [RightPanel (conditional)]
- *
- * State is owned entirely by useAssistantChat — this component is layout-only.
- */
 export const AssistantLayout = () => {
+  const { isDark, toggle } = useTheme();
+  const { data: user } = useCurrentUser();
+  const logout = useLogout();
+  const username = user?.firstName ?? user?.email.split('@')[0];
+
   const {
     messages,
     isPending,
+    toolStatus,
     error,
     rightPanelData,
     sendMessage,
     dismissRightPanel,
     startNewChat,
-  } = useAssistantChat();
+  } = useAssistantChatStream();
 
   return (
-    <div className="flex h-screen overflow-hidden bg-white dark:bg-[#1C1917]">
-      {/* Left sidebar — hidden below md breakpoint */}
-      <div className="hidden md:flex">
-        <Sidebar onNewChat={startNewChat} />
-      </div>
+    <div className="flex flex-col h-screen overflow-hidden bg-white dark:bg-[#1C1917]">
+      <header className="flex items-center justify-between px-4 py-2.5 bg-[#0C0A09] text-white shrink-0">
+        <Link
+          to="/"
+          className="flex items-center gap-2 text-white hover:text-zinc-300 no-underline transition-colors"
+        >
+          <FontAwesomeIcon icon={faHouse} className="text-sm" />
+          <span className="text-sm font-bold tracking-tight">Harbour</span>
+        </Link>
 
-      {/* Center conversation — always visible, takes remaining space */}
-      <ConversationPanel
-        messages={messages}
-        isLoading={isPending}
-        error={error}
-        onSend={sendMessage}
-      />
+        <div className="flex items-center gap-2">
+          <button
+            onClick={startNewChat}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-stone-600 text-sm text-zinc-300 hover:bg-[#292524] hover:text-white transition-colors bg-transparent cursor-pointer"
+          >
+            <span>New chat</span>
+            <FontAwesomeIcon icon={faPenToSquare} className="text-zinc-500 text-xs" />
+          </button>
 
-      {/* Right panel — only mounts when there's data; hidden below lg */}
-      {rightPanelData && (
-        <div className="hidden lg:flex">
-          <RightPanel data={rightPanelData} onDismiss={dismissRightPanel} />
+          <button
+            onClick={toggle}
+            aria-label="Toggle dark mode"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-[#292524] transition-colors bg-transparent border-none cursor-pointer"
+          >
+            <FontAwesomeIcon icon={isDark ? faSun : faMoon} className="text-xs" />
+            <span>{isDark ? 'Light mode' : 'Dark mode'}</span>
+          </button>
+
+          {username && (
+            <>
+              <div className="flex items-center gap-2 px-2">
+                <div className="w-6 h-6 rounded-full bg-stone-600 flex items-center justify-center shrink-0">
+                  <FontAwesomeIcon icon={faUser} className="text-[10px] text-zinc-300" />
+                </div>
+                <span className="text-xs text-zinc-300">{username}</span>
+              </div>
+              <button
+                onClick={() => logout()}
+                className="text-[11px] text-zinc-500 hover:text-white transition-colors bg-transparent border-none cursor-pointer px-2"
+              >
+                Sign out
+              </button>
+            </>
+          )}
         </div>
-      )}
+      </header>
+
+      <div className="flex flex-1 min-h-0">
+        <ConversationPanel
+          messages={messages}
+          isLoading={isPending}
+          toolStatus={toolStatus ?? undefined}
+          error={error}
+          onSend={sendMessage}
+        />
+
+        {/* Desktop: fixed-width side panel */}
+        {rightPanelData && (
+          <div className="hidden lg:flex w-80 xl:w-96 shrink-0">
+            <RightPanel data={rightPanelData} onDismiss={dismissRightPanel} />
+          </div>
+        )}
+
+        {/* Mobile / tablet: bottom sheet */}
+        {rightPanelData && (
+          <div className="lg:hidden fixed inset-x-0 bottom-0 z-40 max-h-[55vh] flex flex-col rounded-t-2xl shadow-2xl overflow-hidden border-t border-gray-200 dark:border-gray-700">
+            <RightPanel data={rightPanelData} onDismiss={dismissRightPanel} />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

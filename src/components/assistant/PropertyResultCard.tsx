@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBed, faBath, faCar } from '@fortawesome/free-solid-svg-icons';
 import type { PropertyListing } from '../../types/chat';
@@ -28,10 +28,9 @@ export const PropertyResultCard = ({ listing }: Props) => {
   if (!property) return null;
 
   return (
-    <Link
-      to={`/property/${property.id}`}
+    <a
+      href={`/property/${property.id}`}
       target="property-detail"
-      rel="noopener noreferrer"
       className="block no-underline bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden hover:shadow-md hover:border-red-300 dark:hover:border-red-700 transition-all"
     >
       {property.images[0] && (
@@ -78,6 +77,6 @@ export const PropertyResultCard = ({ listing }: Props) => {
           )}
         </div>
       </div>
-    </Link>
+    </a>
   );
 };

@@ -53,8 +53,9 @@ export const ChatInput = ({ onSend, disabled }: Props) => {
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            placeholder="Ask about real estate..."
+            placeholder="Ask about real estate... (max 500 characters)"
             disabled={disabled}
+            maxLength={500}
             className="flex-1 resize-none bg-transparent text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none leading-6 py-0.5 disabled:opacity-50"
             style={{ minHeight: '48px', maxHeight: `${MAX_TEXTAREA_HEIGHT}px` }}
           />

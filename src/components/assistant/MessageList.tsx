@@ -3,9 +3,32 @@ import type { Message } from '../../types/chat';
 import { MessageItem } from './MessageItem';
 import { TypingIndicator } from './TypingIndicator';
 
+const TOOL_LABELS: Record<string, string> = {
+  search_properties: 'Searching properties',
+  get_property: 'Looking up property',
+};
+
+function ToolStatusIndicator({ tool }: { tool: string }) {
+  const label = TOOL_LABELS[tool] ?? 'Working';
+  return (
+    <div className="flex gap-3 items-start">
+      <div className="w-7 h-7 rounded-full bg-zinc-700 dark:bg-[#292524] flex items-center justify-center shrink-0 text-white text-[10px] font-bold select-none">
+        H
+      </div>
+      <div className="flex items-center gap-2 pt-2.5 text-sm text-gray-500 dark:text-gray-400">
+        <span className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce [animation-delay:0ms]" />
+        <span className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce [animation-delay:150ms]" />
+        <span className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce [animation-delay:300ms]" />
+        <span className="ml-1">{label}...</span>
+      </div>
+    </div>
+  );
+}
+
 interface Props {
   messages: Message[];
   isLoading: boolean;
+  toolStatus?: string;
   error: string | null;
 }
 
@@ -48,14 +71,19 @@ function SuggestionChip({ label }: { label: string }) {
   );
 }
 
-export const MessageList = ({ messages, isLoading, error }: Props) => {
+export const MessageList = ({ messages, isLoading, toolStatus, error }: Props) => {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isLoading]);
+  }, [messages, isLoading, toolStatus]);
 
-  const isEmpty = messages.length === 0 && !isLoading;
+  // Filter out the empty assistant placeholder — the tool/typing indicator covers it
+  const visibleMessages = messages.filter(
+    (msg) => msg.role !== 'assistant' || msg.content.length > 0,
+  );
+
+  const isEmpty = visibleMessages.length === 0 && !isLoading;
 
   return (
     <div className="flex-1 min-h-0 overflow-y-auto">
@@ -65,11 +93,12 @@ export const MessageList = ({ messages, isLoading, error }: Props) => {
         </div>
       ) : (
         <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
-          {messages.map((msg, i) => (
+          {visibleMessages.map((msg, i) => (
             <MessageItem key={i} message={msg} />
           ))}
 
-          {isLoading && <TypingIndicator />}
+          {toolStatus && <ToolStatusIndicator tool={toolStatus} />}
+          {isLoading && !toolStatus && <TypingIndicator />}
 
           {error && (
             <p className="text-sm text-red-500 dark:text-red-400/70 text-center py-2">{error}</p>

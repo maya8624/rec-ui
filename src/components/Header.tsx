@@ -35,15 +35,6 @@ export default function Header() {
           </div>
 
           <nav className="flex items-center gap-6">
-            <Link to="/" className="text-gray-600 dark:text-gray-300 hover:text-red-600 text-sm font-medium no-underline">
-              Buy
-            </Link>
-            <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-red-600 text-sm font-medium no-underline">
-              Rent
-            </a>
-            <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-red-600 text-sm font-medium no-underline">
-              Sold
-            </a>
             <Link
               to="/assistant"
               className="flex items-center gap-1.5 text-gray-600 dark:text-gray-300 hover:text-red-600 text-sm font-medium no-underline"
