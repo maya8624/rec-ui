@@ -20,6 +20,7 @@ api.interceptors.response.use(
         if (error.response?.status === 401 && !isAuthEndpoint) {
             await logoutApi();
             queryClient.setQueryData(["auth", "me"], null);
+            window.location.href = '/login';
         }
         return Promise.reject(error);
     }

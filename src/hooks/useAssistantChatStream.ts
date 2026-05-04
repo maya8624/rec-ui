@@ -1,8 +1,10 @@
 import { useState, useCallback, useRef } from 'react';
-import { streamChatMessage } from '../api/chatApi';
+import { streamChatMessage, HttpError } from '../api/chatApi';
 import { detectPanelData } from '../utils/chatPanelUtils';
 import { extractErrorMessage } from '../utils/errorUtils';
 import type { Message, ChatRequest, RightPanelData } from '../types/chat';
+
+const TOKEN_RENDER_DELAY_MS = 20;
 
 interface UseAssistantChatReturn {
   messages: Message[];
@@ -23,6 +25,43 @@ export function useAssistantChatStream(): UseAssistantChatReturn {
   const [isPending, setIsPending] = useState(false);
   const [toolStatus, setToolStatus] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const tokenQueueRef = useRef<string[]>([]);
+  const renderingRef = useRef(false);
+  // Holds the user message when 'done' fires so panel detection runs after queue empties
+  const pendingPanelContentRef = useRef<string | null>(null);
+
+  const drain = useCallback(() => {
+    renderingRef.current = true;
+    const interval = window.setInterval(() => {
+      const token = tokenQueueRef.current.shift();
+      if (token !== undefined) {
+        setMessages((prev) => {
+          const last = prev[prev.length - 1];
+          return [...prev.slice(0, -1), { ...last, content: last.content + token }];
+        });
+        return;
+      }
+      // Queue empty — stop and trigger panel detection if stream is done
+      renderingRef.current = false;
+      clearInterval(interval);
+      if (pendingPanelContentRef.current !== null) {
+        const msg = pendingPanelContentRef.current;
+        pendingPanelContentRef.current = null;
+        setRightPanelData((current) => current ?? detectPanelData(msg));
+      }
+    }, TOKEN_RENDER_DELAY_MS);
+  }, []);
+
+  const enqueue = useCallback((token: string) => {
+    tokenQueueRef.current.push(token);
+    if (!renderingRef.current) drain();
+  }, [drain]);
+
+  const resetQueue = useCallback(() => {
+    tokenQueueRef.current = [];
+    renderingRef.current = false;
+    pendingPanelContentRef.current = null;
+  }, []);
 
   const sendMessage = useCallback(
     async (content: string) => {
@@ -40,10 +79,7 @@ export function useAssistantChatStream(): UseAssistantChatReturn {
           (event) => {
             switch (event.type) {
               case 'token':
-                setMessages((prev) => {
-                  const last = prev[prev.length - 1];
-                  return [...prev.slice(0, -1), { ...last, content: last.content + event.content }];
-                });
+                enqueue(event.content);
                 break;
 
               case 'tool_start':
@@ -70,6 +106,7 @@ export function useAssistantChatStream(): UseAssistantChatReturn {
                 break;
 
               case 'error':
+                resetQueue();
                 setMessages((prev) => {
                   const last = prev[prev.length - 1];
                   return last.role === 'assistant' && last.content === ''
@@ -80,14 +117,24 @@ export function useAssistantChatStream(): UseAssistantChatReturn {
                 break;
 
               case 'done':
-                setRightPanelData((current) => current ?? detectPanelData(content));
+                // Let the queue drain naturally; panel detection fires when queue empties
+                if (tokenQueueRef.current.length === 0) {
+                  setRightPanelData((current) => current ?? detectPanelData(content));
+                } else {
+                  pendingPanelContentRef.current = content;
+                }
                 break;
             }
           },
           abortRef.current.signal,
         );
       } catch (err) {
+        resetQueue();
         if ((err as Error).name === 'AbortError') return;
+        if (err instanceof HttpError && err.status === 401) {
+          window.location.href = '/login';
+          return;
+        }
         setMessages((prev) => {
           const last = prev[prev.length - 1];
           return last.role === 'assistant' && last.content === ''
@@ -101,20 +148,21 @@ export function useAssistantChatStream(): UseAssistantChatReturn {
         abortRef.current = null;
       }
     },
-    [threadId],
+    [threadId, enqueue, resetQueue],
   );
 
   const dismissRightPanel = useCallback(() => setRightPanelData(null), []);
 
   const startNewChat = useCallback(() => {
     abortRef.current?.abort();
+    resetQueue();
     setThreadId(null);
     setMessages([]);
     setRightPanelData(null);
     setError(null);
     setIsPending(false);
     setToolStatus(null);
-  }, []);
+  }, [resetQueue]);
 
   return {
     messages,

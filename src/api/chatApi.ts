@@ -3,6 +3,15 @@ import { chatRequestSchema } from "../types/chat";
 import type { ChatRequest, ChatResponse } from "../types/chat";
 import { config } from "../config/config";
 
+export class HttpError extends Error {
+  readonly status: number;
+  constructor(status: number, message?: string) {
+    super(message ?? `HTTP ${status}`);
+    this.name = 'HttpError';
+    this.status = status;
+  }
+}
+
 export const sendChatmessage = async (payload: ChatRequest): Promise<ChatResponse> => {
   chatRequestSchema.parse(payload);
   const res = await api.post("/ai/chat", payload);
@@ -33,7 +42,10 @@ export const streamChatMessage = async (
     signal,
   });
 
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    throw new HttpError(response.status, body?.message);
+  }
 
   const reader = response.body!.getReader();
   const decoder = new TextDecoder();
