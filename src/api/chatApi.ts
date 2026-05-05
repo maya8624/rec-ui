@@ -2,6 +2,7 @@ import { api } from "../services/apiClient";
 import { chatRequestSchema } from "../types/chat";
 import type { ChatRequest, ChatResponse } from "../types/chat";
 import { config } from "../config/config";
+import { tokenStorage } from "../utils/tokenStorage";
 
 export class HttpError extends Error {
   readonly status: number;
@@ -34,11 +35,14 @@ export const streamChatMessage = async (
   chatRequestSchema.parse(payload);
 
   const baseUrl = config.apiBaseUrl || '/api';
+  const token = tokenStorage.get();
   const response = await fetch(`${baseUrl}/ai/chat/stream`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
     body: JSON.stringify(payload),
-    credentials: 'include',
     signal,
   });
 

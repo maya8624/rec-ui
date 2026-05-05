@@ -7,7 +7,7 @@ export type AuthUser = {
   lastName: string | null;
 };
 
-export type AuthResponse = AuthUser;
+export type AuthResponse = AuthUser & { token: string };
 
 export type ErrorResponse = {
   code: number;

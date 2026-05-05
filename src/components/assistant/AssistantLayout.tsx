@@ -7,6 +7,7 @@ import { useLogout } from '../../hooks/useLogout';
 import { useAssistantChatStream } from '../../hooks/useAssistantChatStream';
 import { ConversationPanel } from './ConversationPanel';
 import { RightPanel } from './RightPanel';
+import { Sidebar } from './Sidebar';
 
 export const AssistantLayout = () => {
   const { isDark, toggle } = useTheme();
@@ -27,7 +28,8 @@ export const AssistantLayout = () => {
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-white dark:bg-[#1C1917]">
-      <header className="flex items-center justify-between px-4 py-2.5 bg-[#0C0A09] text-white shrink-0">
+      {/* Mobile header — hidden on desktop where Sidebar takes over */}
+      <header className="lg:hidden flex items-center justify-between px-4 py-2.5 bg-[#0C0A09] text-white shrink-0">
         <Link
           to="/"
           className="flex items-center gap-2 text-white hover:text-zinc-300 no-underline transition-colors"
@@ -51,16 +53,12 @@ export const AssistantLayout = () => {
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-[#292524] transition-colors bg-transparent border-none cursor-pointer"
           >
             <FontAwesomeIcon icon={isDark ? faSun : faMoon} className="text-xs" />
-            <span>{isDark ? 'Light mode' : 'Dark mode'}</span>
           </button>
 
           {username && (
             <>
-              <div className="flex items-center gap-2 px-2">
-                <div className="w-6 h-6 rounded-full bg-stone-600 flex items-center justify-center shrink-0">
-                  <FontAwesomeIcon icon={faUser} className="text-[10px] text-zinc-300" />
-                </div>
-                <span className="text-xs text-zinc-300">{username}</span>
+              <div className="w-6 h-6 rounded-full bg-stone-600 flex items-center justify-center shrink-0">
+                <FontAwesomeIcon icon={faUser} className="text-[10px] text-zinc-300" />
               </div>
               <button
                 onClick={() => logout()}
@@ -74,6 +72,11 @@ export const AssistantLayout = () => {
       </header>
 
       <div className="flex flex-1 min-h-0">
+        {/* Desktop sidebar */}
+        <div className="hidden lg:flex">
+          <Sidebar onNewChat={startNewChat} />
+        </div>
+
         <ConversationPanel
           messages={messages}
           isLoading={isPending}
@@ -82,7 +85,7 @@ export const AssistantLayout = () => {
           onSend={sendMessage}
         />
 
-        {/* Desktop: fixed-width side panel */}
+        {/* Desktop: fixed-width right panel */}
         {rightPanelData && (
           <div className="hidden lg:flex w-80 xl:w-96 shrink-0">
             <RightPanel data={rightPanelData} onDismiss={dismissRightPanel} />

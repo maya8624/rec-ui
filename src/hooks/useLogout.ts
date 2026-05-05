@@ -1,14 +1,14 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { logoutApi } from "../api/authApi";
 import { currentUserQueryKey } from "./useCurrentUser";
+import { tokenStorage } from "../utils/tokenStorage";
 
 export function useLogout() {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
 
-    return async () => {
-        await logoutApi();
+    return () => {
+        tokenStorage.clear();
         queryClient.setQueryData(currentUserQueryKey, null);
         navigate("/login", { replace: true });
     };

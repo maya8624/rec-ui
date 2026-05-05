@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { loginApi, externalLoginApi } from "../api/authApi";
 import { config } from "../config/config";
 import { currentUserQueryKey } from "../hooks/useCurrentUser";
+import { tokenStorage } from "../utils/tokenStorage";
 import type { ErrorResponse } from "../types/auth";
 import type { AxiosError } from "axios";
 
@@ -49,8 +50,9 @@ export default function LoginPage() {
         setIsGoogleLoading(true);
         setError(null);
         externalLoginApi("google", credential)
-          .then((user) => {
-            queryClient.setQueryData(currentUserQueryKey, user);
+          .then((response) => {
+            tokenStorage.set(response.token);
+            queryClient.setQueryData(currentUserQueryKey, response);
             navigate(from, { replace: true });
           })
           .catch(() => setError("Google sign-in failed. Please try again."))
@@ -70,8 +72,9 @@ export default function LoginPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const user = await loginApi(email, password);
-      queryClient.setQueryData(currentUserQueryKey, user);
+      const response = await loginApi(email, password);
+      tokenStorage.set(response.token);
+      queryClient.setQueryData(currentUserQueryKey, response);
       navigate(from, { replace: true });
     } catch (err) {
       const axiosErr = err as AxiosError<ErrorResponse>;

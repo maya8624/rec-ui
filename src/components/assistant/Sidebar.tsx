@@ -9,15 +9,6 @@ interface Props {
   onNewChat: () => void;
 }
 
-// Placeholder items give the sidebar an authentic feel without real persistence
-const PLACEHOLDER_HISTORY: string[] = [
-  'Show me apartments in Bondi',
-  'How does stamp duty work?',
-  'Find houses under $1.5M',
-  'What is the buying process?',
-  'Townhouses in South Yarra',
-];
-
 export const Sidebar = ({ onNewChat }: Props) => {
   const { isDark, toggle } = useTheme();
   const { data: user } = useCurrentUser();
@@ -45,21 +36,7 @@ export const Sidebar = ({ onNewChat }: Props) => {
       </button>
     </div>
 
-    {/* Recent conversations */}
-    <div className="flex-1 overflow-y-auto px-2 py-3">
-      <p className="text-[10px] uppercase tracking-widest text-zinc-500 px-2 mb-2 font-medium">
-        Recent
-      </p>
-      <ul className="space-y-0.5">
-        {PLACEHOLDER_HISTORY.map((label) => (
-          <li key={label}>
-            <button className="w-full text-left text-xs text-zinc-400 hover:text-white hover:bg-[#292524] px-2 py-2 rounded-lg transition-colors truncate bg-transparent border-none cursor-pointer">
-              {label}
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <div className="flex-1" />
 
     {/* User + sign out */}
     {username && (
