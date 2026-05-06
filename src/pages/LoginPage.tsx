@@ -129,7 +129,8 @@ export default function LoginPage() {
 
           {/* Google button */}
           <div className="mb-4">
-            {isGoogleLoading ? (
+            <div ref={googleBtnRef} className={`w-full ${isGoogleLoading ? 'hidden' : ''}`} />
+            {isGoogleLoading && (
               <div className="w-full flex items-center justify-center gap-2 h-10 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-500">
                 <svg
                   className="animate-spin h-4 w-4 text-blue-600"
@@ -152,8 +153,6 @@ export default function LoginPage() {
                 </svg>
                 Signing in with Google...
               </div>
-            ) : (
-              <div ref={googleBtnRef} className="w-full" />
             )}
           </div>
 
