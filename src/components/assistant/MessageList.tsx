@@ -30,6 +30,7 @@ interface Props {
   isLoading: boolean;
   toolStatus?: string;
   error: string | null;
+  onLinkClick?: (propertyId: string, href: string, label: string) => void;
 }
 
 function EmptyState() {
@@ -71,7 +72,7 @@ function SuggestionChip({ label }: { label: string }) {
   );
 }
 
-export const MessageList = ({ messages, isLoading, toolStatus, error }: Props) => {
+export const MessageList = ({ messages, isLoading, toolStatus, error, onLinkClick }: Props) => {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -94,7 +95,7 @@ export const MessageList = ({ messages, isLoading, toolStatus, error }: Props) =
       ) : (
         <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
           {visibleMessages.map((msg, i) => (
-            <MessageItem key={i} message={msg} />
+            <MessageItem key={i} message={msg} onLinkClick={onLinkClick} />
           ))}
 
           {toolStatus && <ToolStatusIndicator tool={toolStatus} />}

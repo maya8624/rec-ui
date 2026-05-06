@@ -22,6 +22,7 @@ export const AssistantLayout = () => {
     error,
     rightPanelData,
     sendMessage,
+    showPropertyPanel,
     dismissRightPanel,
     startNewChat,
   } = useAssistantChatStream();
@@ -83,6 +84,7 @@ export const AssistantLayout = () => {
           toolStatus={toolStatus ?? undefined}
           error={error}
           onSend={sendMessage}
+          onLinkClick={showPropertyPanel}
         />
 
         {/* Desktop: fixed-width right panel */}

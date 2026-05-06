@@ -13,6 +13,7 @@ interface UseAssistantChatReturn {
   error: string | null;
   rightPanelData: RightPanelData | null;
   sendMessage: (content: string) => Promise<void>;
+  showPropertyPanel: (propertyId: string, href: string, label: string) => void;
   dismissRightPanel: () => void;
   startNewChat: () => void;
 }
@@ -92,17 +93,6 @@ export function useAssistantChatStream(): UseAssistantChatReturn {
 
               case 'result':
                 if (event.thread_id) setThreadId(event.thread_id);
-                if (event.listings?.length) {
-                  setRightPanelData({
-                    type: 'properties',
-                    title: 'Properties Found',
-                    properties: event.listings.map((l) => ({
-                      propertyId: l.property_id,
-                      listingId: l.listing_id,
-                      propertyUrl: l.property_url,
-                    })),
-                  });
-                }
                 break;
 
               case 'error':
@@ -151,6 +141,14 @@ export function useAssistantChatStream(): UseAssistantChatReturn {
     [threadId, enqueue, resetQueue],
   );
 
+  const showPropertyPanel = useCallback((propertyId: string, href: string, label: string) => {
+    setRightPanelData({
+      type: 'properties',
+      title: label,
+      properties: [{ propertyId, listingId: propertyId, propertyUrl: href }],
+    });
+  }, []);
+
   const dismissRightPanel = useCallback(() => setRightPanelData(null), []);
 
   const startNewChat = useCallback(() => {
@@ -171,6 +169,7 @@ export function useAssistantChatStream(): UseAssistantChatReturn {
     error,
     rightPanelData,
     sendMessage,
+    showPropertyPanel,
     dismissRightPanel,
     startNewChat,
   };
