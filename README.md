@@ -107,6 +107,27 @@ The `RightPanel` renders contextual data (e.g. property cards) alongside the con
 
 The `MainLayout` also includes a lighter floating chat panel (chatbot button + slide-in overlay) available on public pages. It uses `useChat()`, a simple React Query mutation wrapping a non-streaming `POST /ai/chat` call.
 
+## Deployment
+
+The app is hosted on **Azure Static Web Apps** and deployed automatically via GitHub Actions.
+
+**Trigger:** Push to `main` deploys to production. Pull requests get a preview environment that is torn down on close.
+
+**Workflow:** `.github/workflows/azure-static-web-apps-kind-cliff-0910e7d00.yml`
+- Builds with `vite build` (output: `dist/`)
+- Uses OIDC-based authentication (no long-lived deploy token)
+- Injects environment variables at build time from GitHub secrets
+
+**Required GitHub secrets:**
+
+| Secret | Purpose |
+|--------|---------|
+| `VITE_API_BASE_URL` | Backend API base URL |
+| `VITE_GOOGLE_CLIENT_ID` | Google OAuth client ID |
+| `AZURE_STATIC_WEB_APPS_API_TOKEN_KIND_CLIFF_0910E7D00` | Azure deploy token |
+
+**SPA routing:** `public/staticwebapp.config.json` configures a navigation fallback to `index.html` so client-side routes (React Router) work correctly after a hard refresh.
+
 ## Data Fetching Notes
 
 Property data currently comes from mock data in `src/data/properties.ts` with simulated delays. `src/api/propertyApi.ts` contains comments marking where to swap in real API calls and migrate to the shared `apiClient.ts` instance.
