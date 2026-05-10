@@ -20,7 +20,10 @@ export const registerSchema = z
     firstName: z.string().max(100, "First name must be 100 characters or fewer").optional(),
     lastName: z.string().max(100, "Last name must be 100 characters or fewer").optional(),
     email: z.string().email("Invalid email address"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/\d/, "Password must contain at least one number"),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {

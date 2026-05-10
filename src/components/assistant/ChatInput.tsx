@@ -1,6 +1,6 @@
-import { useState, useRef, useCallback } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { useState, useRef, useCallback } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
   onSend: (value: string) => void;
@@ -10,7 +10,7 @@ interface Props {
 const MAX_TEXTAREA_HEIGHT = 160;
 
 export const ChatInput = ({ onSend, disabled }: Props) => {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const submit = useCallback(() => {
@@ -18,16 +18,16 @@ export const ChatInput = ({ onSend, disabled }: Props) => {
     if (!trimmed || disabled) return;
 
     onSend(trimmed);
-    setValue('');
+    setValue("");
 
     // Reset height after clearing
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = "auto";
     }
   }, [value, disabled, onSend]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       submit();
     }
@@ -37,7 +37,7 @@ export const ChatInput = ({ onSend, disabled }: Props) => {
     setValue(e.target.value);
     // Auto-grow the textarea up to the max height
     const el = e.target;
-    el.style.height = 'auto';
+    el.style.height = "auto";
     el.style.height = `${Math.min(el.scrollHeight, MAX_TEXTAREA_HEIGHT)}px`;
   };
 
@@ -53,11 +53,11 @@ export const ChatInput = ({ onSend, disabled }: Props) => {
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            placeholder="Ask about real estate... (max 500 characters)"
+            placeholder="Ask about real estate..."
             disabled={disabled}
             maxLength={500}
             className="flex-1 resize-none bg-transparent text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none leading-6 py-0.5 disabled:opacity-50"
-            style={{ minHeight: '48px', maxHeight: `${MAX_TEXTAREA_HEIGHT}px` }}
+            style={{ minHeight: "48px", maxHeight: `${MAX_TEXTAREA_HEIGHT}px` }}
           />
           <button
             onClick={submit}

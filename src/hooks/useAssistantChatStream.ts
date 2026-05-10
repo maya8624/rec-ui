@@ -1,10 +1,9 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { streamChatMessage, HttpError } from '../api/chatApi';
 import { detectPanelData } from '../utils/chatPanelUtils';
 import { extractErrorMessage } from '../utils/errorUtils';
 import type { Message, ChatRequest, RightPanelData } from '../types/chat';
 
-const TOKEN_RENDER_DELAY_MS = 20;
 
 interface UseAssistantChatReturn {
   messages: Message[];
@@ -19,12 +18,25 @@ interface UseAssistantChatReturn {
 }
 
 export function useAssistantChatStream(): UseAssistantChatReturn {
-  const [threadId, setThreadId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [threadId, setThreadId] = useState<string | null>(
+    () => sessionStorage.getItem('chat_threadId')
+  );
+  const [messages, setMessages] = useState<Message[]>(
+    () => JSON.parse(sessionStorage.getItem('chat_messages') ?? '[]')
+  );
   const [rightPanelData, setRightPanelData] = useState<RightPanelData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [toolStatus, setToolStatus] = useState<string | null>(null);
+  useEffect(() => {
+    if (threadId) sessionStorage.setItem('chat_threadId', threadId);
+    else sessionStorage.removeItem('chat_threadId');
+  }, [threadId]);
+
+  useEffect(() => {
+    sessionStorage.setItem('chat_messages', JSON.stringify(messages));
+  }, [messages]);
+
   const abortRef = useRef<AbortController | null>(null);
   const tokenQueueRef = useRef<string[]>([]);
   const renderingRef = useRef(false);
@@ -33,24 +45,25 @@ export function useAssistantChatStream(): UseAssistantChatReturn {
 
   const drain = useCallback(() => {
     renderingRef.current = true;
-    const interval = window.setInterval(() => {
-      const token = tokenQueueRef.current.shift();
-      if (token !== undefined) {
+    const tick = () => {
+      const tokens = tokenQueueRef.current.splice(0);
+      if (tokens.length > 0) {
         setMessages((prev) => {
           const last = prev[prev.length - 1];
-          return [...prev.slice(0, -1), { ...last, content: last.content + token }];
+          return [...prev.slice(0, -1), { ...last, content: last.content + tokens.join('') }];
         });
+        requestAnimationFrame(tick);
         return;
       }
-      // Queue empty — stop and trigger panel detection if stream is done
+      // Queue empty — trigger panel detection if stream is done
       renderingRef.current = false;
-      clearInterval(interval);
       if (pendingPanelContentRef.current !== null) {
         const msg = pendingPanelContentRef.current;
         pendingPanelContentRef.current = null;
         setRightPanelData((current) => current ?? detectPanelData(msg));
       }
-    }, TOKEN_RENDER_DELAY_MS);
+    };
+    requestAnimationFrame(tick);
   }, []);
 
   const enqueue = useCallback((token: string) => {
@@ -160,6 +173,8 @@ export function useAssistantChatStream(): UseAssistantChatReturn {
     setError(null);
     setIsPending(false);
     setToolStatus(null);
+    sessionStorage.removeItem('chat_threadId');
+    sessionStorage.removeItem('chat_messages');
   }, [resetQueue]);
 
   return {

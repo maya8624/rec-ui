@@ -1,15 +1,15 @@
-import { useEffect, useRef } from 'react';
-import type { Message } from '../../types/chat';
-import { MessageItem } from './MessageItem';
-import { TypingIndicator } from './TypingIndicator';
+import { useEffect, useRef } from "react";
+import type { Message } from "../../types/chat";
+import { MessageItem } from "./MessageItem";
+import { TypingIndicator } from "./TypingIndicator";
 
 const TOOL_LABELS: Record<string, string> = {
-  search_properties: 'Searching properties',
-  get_property: 'Looking up property',
+  search_properties: "Searching properties",
+  get_property: "Looking up property",
 };
 
 function ToolStatusIndicator({ tool }: { tool: string }) {
-  const label = TOOL_LABELS[tool] ?? 'Working';
+  const label = TOOL_LABELS[tool] ?? "Working";
   return (
     <div className="flex gap-3 items-start">
       <div className="w-7 h-7 rounded-full bg-zinc-700 dark:bg-[#292524] flex items-center justify-center shrink-0 text-white text-[10px] font-bold select-none">
@@ -48,7 +48,7 @@ function EmptyState() {
           duty, or anything else real estate.
         </p>
       </div>
-      <div className="grid grid-cols-2 gap-2 mt-2 w-full max-w-sm">
+      <div className="flex flex-wrap justify-center gap-2 mt-2 w-full max-w-sm">
         {SUGGESTIONS.map((s) => (
           <SuggestionChip key={s} label={s} />
         ))}
@@ -58,10 +58,9 @@ function EmptyState() {
 }
 
 const SUGGESTIONS = [
-  'Show me apartments in Bondi',
-  'How does stamp duty work?',
-  'Find houses under $1.5M',
-  'What is the buying process?',
+  "Show me apartments in Sydney",
+  "Find houses under $2.5M in Parramatta",
+  "What are the agency details?",
 ];
 
 function SuggestionChip({ label }: { label: string }) {
@@ -72,16 +71,22 @@ function SuggestionChip({ label }: { label: string }) {
   );
 }
 
-export const MessageList = ({ messages, isLoading, toolStatus, error, onLinkClick }: Props) => {
+export const MessageList = ({
+  messages,
+  isLoading,
+  toolStatus,
+  error,
+  onLinkClick,
+}: Props) => {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading, toolStatus]);
 
   // Filter out the empty assistant placeholder — the tool/typing indicator covers it
   const visibleMessages = messages.filter(
-    (msg) => msg.role !== 'assistant' || msg.content.length > 0,
+    (msg) => msg.role !== "assistant" || msg.content.length > 0,
   );
 
   const isEmpty = visibleMessages.length === 0 && !isLoading;
@@ -102,7 +107,9 @@ export const MessageList = ({ messages, isLoading, toolStatus, error, onLinkClic
           {isLoading && !toolStatus && <TypingIndicator />}
 
           {error && (
-            <p className="text-sm text-red-500 dark:text-red-400/70 text-center py-2">{error}</p>
+            <p className="text-sm text-red-500 dark:text-red-400/70 text-center py-2">
+              {error}
+            </p>
           )}
 
           <div ref={bottomRef} />

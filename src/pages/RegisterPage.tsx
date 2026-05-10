@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { registerApi, externalLoginApi } from "../api/authApi";
 import { currentUserQueryKey } from "../hooks/useCurrentUser";
+import { tokenStorage } from "../utils/tokenStorage";
 import { registerSchema } from "../types/auth";
 import type { ErrorResponse } from "../types/auth";
 import type { AxiosError } from "axios";
@@ -81,8 +82,9 @@ export default function RegisterPage() {
 
         setIsLoading(true);
         try {
-            await registerApi(email, password, firstName || undefined, lastName || undefined);
-            await queryClient.invalidateQueries({ queryKey: currentUserQueryKey });
+            const response = await registerApi(email, password, firstName || undefined, lastName || undefined);
+            tokenStorage.set(response.token);
+            queryClient.setQueryData(currentUserQueryKey, response);
             navigate("/", { replace: true });
         } catch (err) {
             const axiosErr = err as AxiosError<ErrorResponse>;
@@ -215,7 +217,7 @@ export default function RegisterPage() {
                                 onChange={(e) => setPassword(e.target.value)}
                                 disabled={isDisabled}
                                 className={inputClass("password")}
-                                placeholder="Min. 6 characters"
+                                placeholder="Min. 8 chars, include a number"
                             />
                             {fieldErrors.password && (
                                 <p className="text-xs text-red-500 mt-1">{fieldErrors.password}</p>
