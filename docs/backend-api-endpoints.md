@@ -13,29 +13,7 @@ All error responses use the shape:
 ## Auth — `/api/auth`
 
 ### POST `/api/auth/login`
-Authenticate with email and password. Sets an HttpOnly auth cookie on success.
-
-**Auth:** None required
-
-**Request body:**
-```json
-{
-  "email": "user@example.com",
-  "password": "secret"
-}
-```
-
-**Response `200 OK`:** `true`
-
-**Response `401 Unauthorized`:**
-```json
-{ "message": "Invalid email or password" }
-```
-
----
-
-### POST `/api/auth/register`
-Register a new user with email and password.
+Authenticate with email and password.
 
 **Auth:** None required
 
@@ -50,15 +28,48 @@ Register a new user with email and password.
 **Response `200 OK`:**
 ```json
 {
+  "userId": "3fa85f64-...",
   "email": "user@example.com",
-  "userId": "guid"
+  "firstName": "Jane",
+  "lastName": "Doe",
+  "token": "<JWT access token>",
+  "refreshToken": "<opaque refresh token>"
 }
+```
+
+**Response `401 Unauthorized`:**
+```json
+{ "code": 401, "name": "INVALID_CREDENTIALS", "message": "Invalid email or password" }
+```
+
+---
+
+### POST `/api/auth/register`
+Register a new user.
+
+**Auth:** None required
+
+**Request body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "secret",
+  "firstName": "Jane",
+  "lastName": "Doe"
+}
+```
+
+**Response `200 OK`:** same shape as `/auth/login` — `{ userId, email, firstName, lastName, token, refreshToken }`
+
+**Response `409 Conflict`:**
+```json
+{ "code": 409, "name": "EMAIL_TAKEN", "message": "Email already registered" }
 ```
 
 ---
 
 ### POST `/api/auth/external-login`
-Authenticate using a third-party provider (e.g. Google). Sets an HttpOnly auth cookie on success.
+Login or register via a third-party OAuth provider (Google).
 
 **Auth:** None required
 
@@ -70,37 +81,48 @@ Authenticate using a third-party provider (e.g. Google). Sets an HttpOnly auth c
 }
 ```
 
-**Response `200 OK`:**
-```json
-{
-  "email": "user@example.com",
-  "userId": "guid"
-}
-```
+**Response `200 OK`:** same shape as `/auth/login` — `{ userId, email, firstName, lastName, token, refreshToken }`
 
-**Response `401 Unauthorized`:** empty body
+**Response `401 Unauthorized`:**
+```json
+{ "code": 401, "name": "GOOGLE_TOKEN_INVALID", "message": "..." }
+```
 
 ---
 
-### POST `/api/auth/logout`
-Clear the auth cookie.
+### POST `/api/auth/refresh`
+Exchange a valid refresh token for a new access token and refresh token. No `Authorization` header required.
 
-**Auth:** Required
+Refresh tokens are **single-use** — always store the new pair returned in the response.
 
-**Response `200 OK`:** empty body
+**Auth:** None required
+
+**Request body:**
+```json
+{ "refreshToken": "<stored refresh token>" }
+```
+
+**Response `200 OK`:** same shape as `/auth/login` — `{ userId, email, firstName, lastName, token, refreshToken }`
+
+**Response `401 Unauthorized`:**
+```json
+{ "name": "INVALID_REFRESH_TOKEN", "message": "Refresh token is invalid or expired" }
+```
 
 ---
 
 ### GET `/api/auth/me`
-Return the currently authenticated user from the token cookie.
+Return the currently authenticated user from JWT claims (no database hit).
 
-**Auth:** Required
+**Auth:** Required (`Authorization: Bearer <token>`)
 
 **Response `200 OK`:**
 ```json
 {
+  "userId": "3fa85f64-...",
   "email": "user@example.com",
-  "userId": "guid"
+  "firstName": "Jane",
+  "lastName": "Doe"
 }
 ```
 

