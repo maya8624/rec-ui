@@ -51,7 +51,7 @@ export default function LoginPage() {
         setError(null);
         externalLoginApi("google", credential)
           .then((response) => {
-            tokenStorage.set(response.token);
+            tokenStorage.setTokens(response.token, response.refreshToken);
             queryClient.setQueryData(currentUserQueryKey, response);
             navigate(from, { replace: true });
           })
@@ -73,7 +73,7 @@ export default function LoginPage() {
     setError(null);
     try {
       const response = await loginApi(email, password);
-      tokenStorage.set(response.token);
+      tokenStorage.setTokens(response.token, response.refreshToken);
       queryClient.setQueryData(currentUserQueryKey, response);
       navigate(from, { replace: true });
     } catch (err) {

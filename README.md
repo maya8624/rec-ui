@@ -77,10 +77,13 @@ Public pages (`/`, `/property/:id`) are wrapped in `MainLayout`, which renders t
 
 ## Auth
 
-- JWT is stored in `localStorage` under `auth_token` via `src/utils/tokenStorage.ts`
-- The `apiClient.ts` axios instance attaches the token as an `Authorization: Bearer` header on every request
+- JWT access token is stored in `localStorage` under `auth_token`; refresh token under `refresh_token` — both managed by `src/utils/tokenStorage.ts`
+- The `apiClient.ts` axios instance attaches the access token as an `Authorization: Bearer` header on every request
+- On a 401 response, the interceptor automatically calls `POST /auth/refresh` with the stored refresh token. On success both tokens are rotated and the original request is retried transparently. If the refresh also returns 401 the session is expired and the user is redirected to `/login`
+- Concurrent requests that 401 while a refresh is in flight are queued and replayed once the new token arrives
 - `AuthGuard` wraps protected routes and redirects unauthenticated users to `/login`
 - Registration and login support both email/password and Google OAuth (`externalLoginApi`)
+- Token lifetimes: access token 60 min (configurable), refresh token 7 days (single-use, rotates on each refresh)
 - Form validation uses Zod schemas defined in `src/types/auth.ts`
 
 ## AI Assistant

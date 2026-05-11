@@ -46,8 +46,9 @@ export default function RegisterPage() {
                 setIsGoogleLoading(true);
                 setServerError(null);
                 try {
-                    await externalLoginApi("google", credential);
-                    await queryClient.invalidateQueries({ queryKey: currentUserQueryKey });
+                    const response = await externalLoginApi("google", credential);
+                    tokenStorage.setTokens(response.token, response.refreshToken);
+                    queryClient.setQueryData(currentUserQueryKey, response);
                     navigate("/", { replace: true });
                 } catch {
                     setServerError("Google sign-up failed. Please try again.");
@@ -83,7 +84,7 @@ export default function RegisterPage() {
         setIsLoading(true);
         try {
             const response = await registerApi(email, password, firstName || undefined, lastName || undefined);
-            tokenStorage.set(response.token);
+            tokenStorage.setTokens(response.token, response.refreshToken);
             queryClient.setQueryData(currentUserQueryKey, response);
             navigate("/", { replace: true });
         } catch (err) {
