@@ -1,17 +1,6 @@
 import { api } from "../services/apiClient";
 import { chatRequestSchema } from "../types/chat";
 import type { ChatRequest, ChatResponse } from "../types/chat";
-import { config } from "../config/config";
-import { tokenStorage } from "../utils/tokenStorage";
-
-export class HttpError extends Error {
-  readonly status: number;
-  constructor(status: number, message?: string) {
-    super(message ?? `HTTP ${status}`);
-    this.name = 'HttpError';
-    this.status = status;
-  }
-}
 
 export const sendChatmessage = async (payload: ChatRequest): Promise<ChatResponse> => {
   chatRequestSchema.parse(payload);
@@ -34,47 +23,34 @@ export const streamChatMessage = async (
 ): Promise<void> => {
   chatRequestSchema.parse(payload);
 
-  const baseUrl = config.apiBaseUrl || '/api';
-  const token = tokenStorage.get();
-  const response = await fetch(`${baseUrl}/ai/chat/stream`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify(payload),
-    signal,
-  });
-
-  if (!response.ok) {
-    const body = await response.json().catch(() => null);
-    throw new HttpError(response.status, body?.message);
-  }
-
-  const reader = response.body!.getReader();
-  const decoder = new TextDecoder();
+  let processedLength = 0;
   let buffer = '';
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
+  await api.post('/ai/chat/stream', payload, {
+    responseType: 'text',
+    onDownloadProgress: (progressEvent) => {
+      const xhr = progressEvent.event.target as XMLHttpRequest;
+      const newData = xhr.responseText.slice(processedLength);
+      processedLength = xhr.responseText.length;
 
-    buffer += decoder.decode(value, { stream: true });
-    const events = buffer.split('\n\n');
-    buffer = events.pop() ?? '';
+      buffer += newData;
+      const parts = buffer.split('\n\n');
+      buffer = parts.pop() ?? '';
 
-    for (const event of events) {
-      const line = event.trim();
-      if (!line.startsWith('data:')) continue;
-      const jsonStr = line.slice('data:'.length).trim();
-      if (!jsonStr) continue;
-      if (jsonStr === '[DONE]') {
-        onEvent({ type: 'done' });
-        continue;
+      for (const part of parts) {
+        const line = part.trim();
+        if (!line.startsWith('data:')) continue;
+        const jsonStr = line.slice('data:'.length).trim();
+        if (!jsonStr) continue;
+        if (jsonStr === '[DONE]') {
+          onEvent({ type: 'done' });
+          continue;
+        }
+        onEvent(JSON.parse(jsonStr) as StreamEvent);
       }
-      onEvent(JSON.parse(jsonStr) as StreamEvent);
-    }
-  }
+    },
+    signal,
+  });
 };
 
 export const getHistory = async (sessionId: string) => {

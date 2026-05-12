@@ -100,7 +100,17 @@ export const MessageList = ({
       ) : (
         <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
           {visibleMessages.map((msg, i) => (
-            <MessageItem key={i} message={msg} onLinkClick={onLinkClick} />
+            <MessageItem
+              key={i}
+              message={msg}
+              onLinkClick={onLinkClick}
+              isStreaming={
+                isLoading &&
+                !toolStatus &&
+                i === visibleMessages.length - 1 &&
+                msg.role === 'assistant'
+              }
+            />
           ))}
 
           {toolStatus && <ToolStatusIndicator tool={toolStatus} />}

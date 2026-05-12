@@ -28,7 +28,7 @@ export const AssistantLayout = () => {
   } = useAssistantChatStream();
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-white dark:bg-[#1C1917]">
+    <div className="flex flex-col h-screen overflow-hidden bg-white dark:bg-[#1C1917] font-[Inter,sans-serif] text-[15px] leading-relaxed">
       {/* Mobile header — hidden on desktop where Sidebar takes over */}
       <header className="lg:hidden flex items-center justify-between px-4 py-2.5 bg-[#0C0A09] text-white shrink-0">
         <Link

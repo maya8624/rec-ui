@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { streamChatMessage, HttpError } from '../api/chatApi';
+import axios from 'axios';
+import { streamChatMessage } from '../api/chatApi';
 import { detectPanelData } from '../utils/chatPanelUtils';
 import { extractErrorMessage } from '../utils/errorUtils';
 import type { Message, ChatRequest, RightPanelData } from '../types/chat';
@@ -133,11 +134,7 @@ export function useAssistantChatStream(): UseAssistantChatReturn {
         );
       } catch (err) {
         resetQueue();
-        if ((err as Error).name === 'AbortError') return;
-        if (err instanceof HttpError && err.status === 401) {
-          window.location.href = '/login';
-          return;
-        }
+        if (axios.isCancel(err)) return;
         setMessages((prev) => {
           const last = prev[prev.length - 1];
           return last.role === 'assistant' && last.content === ''
