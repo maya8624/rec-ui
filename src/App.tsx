@@ -10,6 +10,8 @@ import DepositSuccessPage from "./pages/DepositSuccessPage";
 import DepositCancelPage from "./pages/DepositCancelPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import CopilotPage from "./pages/copilot/CopilotPage";
+import AgentDashboard from "./pages/agent/AgentDashboard";
 
 
 export default function App() {
@@ -20,6 +22,10 @@ export default function App() {
           {/* Public auth pages */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+
+          {/* Demo pages */}
+          <Route path="/copilot" element={<CopilotPage />} />
+          <Route path="/agent" element={<AgentDashboard />} />
 
           {/* Public pages — Header + floating chatbot */}
           <Route element={<MainLayout />}>
