@@ -1,3 +1,20 @@
+export type PreferenceRequest = {
+  suburbs: string[]
+  maxRent: number
+  minBeds: number
+  maxBeds: number
+  petFriendly: boolean
+  availableWithinDays: number
+}
+
+export type PreferenceResponse = {
+  message: string
+  listings: Record<string, unknown>[]
+  displayCount: number
+  totalCount: number
+  hasMore: boolean
+}
+
 export type WorkflowStep = {
   status: 'done' | 'pending' | 'waiting'
   label: string

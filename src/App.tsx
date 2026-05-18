@@ -24,7 +24,6 @@ export default function App() {
           <Route path="/register" element={<RegisterPage />} />
 
           {/* Demo pages */}
-          <Route path="/copilot" element={<CopilotPage />} />
           <Route path="/agent" element={<AgentDashboard />} />
 
           {/* Public pages — Header + floating chatbot */}
@@ -36,6 +35,7 @@ export default function App() {
           {/* Protected pages */}
           <Route element={<AuthGuard><Outlet /></AuthGuard>}>
             <Route path="/assistant" element={<AssistantPage />} />
+            <Route path="/copilot" element={<CopilotPage />} />
             <Route path="/deposit/success" element={<DepositSuccessPage />} />
             <Route path="/deposit/cancel" element={<DepositCancelPage />} />
           </Route>
