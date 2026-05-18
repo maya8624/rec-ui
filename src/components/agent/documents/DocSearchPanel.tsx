@@ -54,8 +54,8 @@ export function DocSearchPanel() {
   }
 
   return (
-    <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm flex flex-col h-[600px] md:h-auto md:flex-1 md:min-h-0">
-      <div className="flex-1 min-h-0 overflow-y-auto p-5 space-y-5">
+    <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm flex flex-col md:flex-1 md:min-h-0">
+      <div className="p-5 space-y-5 md:flex-1 md:min-h-0 md:overflow-y-auto">
         {messages.map(msg => (
           <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             {msg.role === 'user' ? (

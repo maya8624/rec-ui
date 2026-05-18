@@ -8,7 +8,7 @@ function dotClass(status: AgentWorkflowStep['status']) {
 
 export function WorkflowFooter({ steps }: { steps: AgentWorkflowStep[] }) {
   return (
-    <div className="flex-shrink-0 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-4 py-2 flex items-center overflow-x-auto">
+    <div className="flex-shrink-0 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-4 py-2 flex items-center flex-wrap gap-y-1">
       {steps.map((step, i) => (
         <div key={i} className="flex items-center flex-shrink-0">
           <div className="flex items-center gap-1.5 px-2 py-1">

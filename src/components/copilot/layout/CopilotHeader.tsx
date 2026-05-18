@@ -1,4 +1,5 @@
-import { Building2 } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Building2, House } from 'lucide-react'
 
 export function CopilotHeader() {
   return (
@@ -13,7 +14,14 @@ export function CopilotHeader() {
         Harbour Realty Group
       </span>
       <div className="flex-1" />
-      <span className="text-xs text-slate-400 dark:text-slate-500">Sydney · Rental</span>
+      <Link
+        to="/"
+        className="flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 transition-colors no-underline"
+      >
+        <House className="w-3.5 h-3.5" />
+        Home
+      </Link>
+      <span className="hidden sm:inline text-xs text-slate-400 dark:text-slate-500">Sydney · Rental</span>
     </header>
   )
 }

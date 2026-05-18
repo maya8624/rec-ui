@@ -40,7 +40,7 @@ export function EnquiryDetail({ enquiryId, draft }: Props) {
   return (
     <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm overflow-hidden flex flex-col md:flex-1 md:min-h-0">
       {/* content scrolls internally on both mobile and desktop */}
-      <div className="flex-1 min-h-0 overflow-y-auto p-5 space-y-5 max-h-[600px] md:max-h-none">
+      <div className="p-5 space-y-5 md:flex-1 md:min-h-0 md:overflow-y-auto">
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-base font-semibold text-gray-900 dark:text-slate-100">{enquiry.sender}</p>

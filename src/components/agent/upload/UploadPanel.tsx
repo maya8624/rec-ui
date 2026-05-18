@@ -55,7 +55,7 @@ export function UploadPanel({ uploads, isUploading, error, onUpload }: Props) {
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
           onClick={() => !isUploading && inputRef.current?.click()}
-          className={`border-2 border-dashed rounded-xl p-12 flex flex-col items-center gap-3 transition-colors ${
+          className={`border-2 border-dashed rounded-xl p-6 md:p-12 flex flex-col items-center gap-3 transition-colors ${
             isUploading
               ? 'border-slate-200 dark:border-slate-700 cursor-default'
               : isDragging

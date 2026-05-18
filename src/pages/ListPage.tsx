@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import type { Property } from '../types/property';
 import { useInfiniteProperties } from '../hooks/useProperties';
 import PropertyCard from '../components/PropertyCard';
 import PropertyCardSkeleton from '../components/PropertyCardSkeleton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSliders } from '@fortawesome/free-solid-svg-icons';
+import { faSliders, faRobot, faUserTie } from '@fortawesome/free-solid-svg-icons';
 
 export default function ListPage() {
   const [selectedType, setSelectedType] = useState<Property['propertyType'] | null>(null);
@@ -59,13 +60,31 @@ export default function ListPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       {/* Page Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
-          {listingType === 'Sale' ? 'Properties for Sale' : listingType === 'Rent' ? 'Properties for Rent' : 'All Properties'}
-        </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          {total > 0 && `${total} properties found`}
-        </p>
+      <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+            {listingType === 'Sale' ? 'Properties for Sale' : listingType === 'Rent' ? 'Properties for Rent' : 'All Properties'}
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {total > 0 && `${total} properties found`}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Link
+            to="/copilot"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition-colors no-underline"
+          >
+            <FontAwesomeIcon icon={faRobot} className="text-xs" />
+            Copilot
+          </Link>
+          <Link
+            to="/agent"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-red-500 hover:text-red-600 text-sm font-medium transition-colors no-underline"
+          >
+            <FontAwesomeIcon icon={faUserTie} className="text-xs" />
+            Agent
+          </Link>
+        </div>
       </div>
 
       {/* Buy / Rent toggle */}
