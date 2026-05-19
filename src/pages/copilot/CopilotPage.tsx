@@ -5,6 +5,7 @@ import { CopilotHeader } from '../../components/copilot/layout/CopilotHeader'
 import { LeftColumn } from '../../components/copilot/layout/LeftColumn'
 import { CopilotPanel } from '../../components/copilot/layout/CopilotPanel'
 import { workflowSteps, suggestedSteps } from '../../data/copilot/demoData'
+import { mockPreferencePayload } from '../../api/preferencesApi'
 
 export default function CopilotPage() {
   const { messages, isStreaming, handleSend, handleAction: chatHandleAction } = useCopilotChat()
@@ -17,6 +18,11 @@ export default function CopilotPage() {
       if (matchesSentRef.current) return
       matchesSentRef.current = true
       await handleSend('Find matching properties', data?.message)
+      return
+    }
+    if (label === 'Suburb summary') {
+      const suburbs = mockPreferencePayload.suburbs.join(', ')
+      await handleSend(`Give me a suburb summary for ${suburbs}`)
       return
     }
     chatHandleAction(label)

@@ -28,7 +28,7 @@ describe('fetchPreferences', () => {
   it('returns the response data', async () => {
     const response: PreferenceResponse = {
       message: 'Found 2 listings',
-      listings: [{ id: '1', address: '12 Campbell Parade' }],
+      listings: [{ propertyId: '1', listingId: 'l1', imageUrl: '', addressLine1: '12 Campbell Parade', suburb: 'Bondi', bedrooms: 2, bathrooms: 1, price: 500, buildingSizeSqm: null, propertyType: 'apartment' }],
       displayCount: 1,
       totalCount: 2,
       hasMore: true,
