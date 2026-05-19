@@ -23,7 +23,7 @@ function StatItem({ icon, value, label }: StatItemProps) {
 interface PropertyStatsProps {
   bedrooms: number;
   bathrooms: number;
-  parking: number;
+  carSpaces: number;
   landSize: number;
   propertyType: string;
 }
@@ -31,7 +31,7 @@ interface PropertyStatsProps {
 export default function PropertyStats({
   bedrooms,
   bathrooms,
-  parking,
+  carSpaces,
   landSize,
   propertyType,
 }: PropertyStatsProps) {
@@ -39,7 +39,7 @@ export default function PropertyStats({
     <div className="flex items-center gap-6 py-4 px-6 bg-gray-50 dark:bg-gray-800 rounded-xl mb-6">
       {bedrooms > 0 && <StatItem icon={faBed} value={bedrooms} label="Beds" />}
       {bathrooms > 0 && <StatItem icon={faBath} value={bathrooms} label="Baths" />}
-      {parking > 0 && <StatItem icon={faCar} value={parking} label="Cars" />}
+      {carSpaces > 0 && <StatItem icon={faCar} value={carSpaces} label="Cars" />}
       {landSize > 0 && <StatItem icon={faRulerCombined} value={`${landSize}m²`} label="Land" />}
       <div className="ml-auto">
         <span className="px-3 py-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-full text-sm text-gray-600 dark:text-gray-300">

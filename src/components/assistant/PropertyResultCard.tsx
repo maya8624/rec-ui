@@ -69,10 +69,10 @@ export const PropertyResultCard = ({ listing }: Props) => {
               {property.bathrooms}
             </span>
           )}
-          {property.parking > 0 && (
+          {property.carSpaces > 0 && (
             <span className="flex items-center gap-1">
               <FontAwesomeIcon icon={faCar} />
-              {property.parking}
+              {property.carSpaces}
             </span>
           )}
         </div>

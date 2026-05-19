@@ -83,7 +83,7 @@ export default function DetailPage() {
           <PropertyStats
             bedrooms={property.bedrooms}
             bathrooms={property.bathrooms}
-            parking={property.parking}
+            carSpaces={property.carSpaces}
             landSize={property.landSize}
             propertyType={property.propertyType}
           />

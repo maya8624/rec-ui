@@ -95,10 +95,10 @@ export default function PropertyCard({ property }: PropertyCardProps) {
                 {property.bathrooms}
               </span>
             )}
-            {property.parking > 0 && (
+            {property.carSpaces > 0 && (
               <span className="flex items-center gap-1.5">
                 <FontAwesomeIcon icon={faCar} className="text-gray-400" />
-                {property.parking}
+                {property.carSpaces}
               </span>
             )}
             {property.landSize > 0 && (

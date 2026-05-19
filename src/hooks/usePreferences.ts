@@ -1,9 +1,9 @@
-import { useMutation } from '@tanstack/react-query';
-import { fetchPreferences } from '../api/preferencesApi';
-import type { PreferenceRequest } from '../types/copilot';
+import { useQuery } from '@tanstack/react-query';
+import { fetchPreferences, mockPreferencePayload } from '../api/preferencesApi';
 
 export const usePreferences = () => {
-  return useMutation({
-    mutationFn: (payload: PreferenceRequest) => fetchPreferences(payload),
+  return useQuery({
+    queryKey: ['preferences', mockPreferencePayload],
+    queryFn: () => fetchPreferences(mockPreferencePayload),
   });
 };

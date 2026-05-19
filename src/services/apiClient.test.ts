@@ -69,13 +69,28 @@ describe('apiClient response interceptor — token refresh', () => {
     expect(tokenStorage.get()).toBeNull();
   });
 
-  it('does not attempt refresh for /auth/ endpoints', async () => {
+  it('does not attempt refresh when the refresh endpoint itself returns 401', async () => {
     tokenStorage.setTokens('old-access', 'valid-refresh');
-    mock.onPost('/auth/login').reply(401);
+    mock.onPost('/auth/refresh').reply(401);
+    mock.onGet('/protected').reply(401);
 
-    await expect(api.post('/auth/login', {})).rejects.toThrow();
+    await expect(api.get('/protected')).rejects.toThrow();
 
-    expect(mock.history.post.filter((r) => r.url === '/auth/refresh')).toHaveLength(0);
+    expect(mock.history.post.filter((r) => r.url === '/auth/refresh')).toHaveLength(1);
+    expect(window.location.href).toBe('/login');
+  });
+
+  it('attempts refresh for /auth/me when the access token is expired', async () => {
+    tokenStorage.setTokens('old-access', 'valid-refresh');
+
+    mock.onGet('/auth/me').replyOnce(401);
+    mock.onPost('/auth/refresh').replyOnce(200, { token: 'new-access', refreshToken: 'new-refresh' });
+    mock.onGet('/auth/me').reply(200, { id: '1', email: 'user@example.com' });
+
+    const response = await api.get('/auth/me');
+
+    expect(response.data).toEqual({ id: '1', email: 'user@example.com' });
+    expect(tokenStorage.get()).toBe('new-access');
   });
 
   it('passes non-401 errors through without attempting refresh', async () => {

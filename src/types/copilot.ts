@@ -7,9 +7,22 @@ export type PreferenceRequest = {
   availableWithinDays: number
 }
 
+export type ListingItem = {
+  propertyId: string
+  listingId: string
+  imageUrl: string
+  addressLine1: string
+  suburb: string
+  bedrooms: number
+  bathrooms: number
+  price: number
+  buildingSizeSqm: number | null
+  propertyType: string
+}
+
 export type PreferenceResponse = {
   message: string
-  listings: Record<string, unknown>[]
+  listings: ListingItem[]
   displayCount: number
   totalCount: number
   hasMore: boolean
@@ -28,21 +41,3 @@ export type CopilotMessage = {
   streaming?: boolean
 }
 
-export type Property = {
-  id: string
-  address: string
-  suburb: string
-  state: string
-  postcode: string
-  price: number
-  beds: number
-  baths: number
-  cars: number
-  sqm: number
-  tags: string[]
-  agent: string
-  agentInitials: string
-  badge?: 'Best match' | 'Popular' | 'Available now'
-  featured?: boolean
-  image: string
-}

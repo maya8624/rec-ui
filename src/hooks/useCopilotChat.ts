@@ -13,13 +13,10 @@ export function useCopilotChat() {
     const aiMsg: CopilotMessage = { id: aiId, role: 'ai', text: '', streaming: true }
     setMessages(prev => [...prev, userMsg, aiMsg])
     setIsStreaming(true)
-    let responseText = responseOverride
-    if (!responseText) {
-      const matchKey = Object.keys(actionResponses).find(k =>
-        userText.toLowerCase().includes(k.toLowerCase())
-      )
-      responseText = matchKey ? actionResponses[matchKey] : 'Let me look into that for you.'
-    }
+    const matchKey = Object.keys(actionResponses).find(k =>
+      userText.toLowerCase().includes(k.toLowerCase())
+    )
+    const responseText = responseOverride ?? (matchKey ? actionResponses[matchKey] : 'Let me look into that for you.')
     await streamMessage(
       responseText,
       (chunk) =>

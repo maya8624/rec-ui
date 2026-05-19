@@ -9,7 +9,8 @@ export interface Property {
   propertyType: 'House' | 'Apartment' | 'Townhouse' | 'Villa' | 'Land';
   bedrooms: number;
   bathrooms: number;
-  parking: number;
+  carSpaces: number;
+  buildingSizeSqm: number;
   landSize: number;
   description: string;
   features: string[];

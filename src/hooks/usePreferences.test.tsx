@@ -1,4 +1,4 @@
-import { act, renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { usePreferences } from './usePreferences';
@@ -19,7 +19,7 @@ vi.mock('../api/preferencesApi', () => ({
 
 function createWrapper() {
   const queryClient = new QueryClient({
-    defaultOptions: { mutations: { retry: false } },
+    defaultOptions: { queries: { retry: false } },
   });
   return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
@@ -28,7 +28,9 @@ function createWrapper() {
 
 const mockResponse: PreferenceResponse = {
   message: 'Found 2 listings',
-  listings: [{ id: '1' }],
+  listings: [
+    { listingId: '1', propertyId: 'p1', imageUrl: '', addressLine1: '12 Campbell Parade', suburb: 'Bondi Beach', bedrooms: 2, bathrooms: 1, price: 850, buildingSizeSqm: null, propertyType: 'Apartment' },
+  ],
   displayCount: 1,
   totalCount: 2,
   hasMore: true,
@@ -37,12 +39,10 @@ const mockResponse: PreferenceResponse = {
 describe('usePreferences', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('calls fetchPreferences with the given payload and returns data', async () => {
+  it('auto-fetches on mount and returns data', async () => {
     (fetchPreferences as Mock).mockResolvedValue(mockResponse);
 
     const { result } = renderHook(() => usePreferences(), { wrapper: createWrapper() });
-
-    act(() => { result.current.mutate(mockPreferencePayload); });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
@@ -50,7 +50,7 @@ describe('usePreferences', () => {
     expect(result.current.data).toEqual(mockResponse);
   });
 
-  it('sets isPending true while the request is in flight', async () => {
+  it('sets isLoading true while the request is in flight', async () => {
     let resolve!: (val: PreferenceResponse) => void;
     (fetchPreferences as Mock).mockImplementation(
       () => new Promise<PreferenceResponse>((r) => { resolve = r; }),
@@ -58,20 +58,16 @@ describe('usePreferences', () => {
 
     const { result } = renderHook(() => usePreferences(), { wrapper: createWrapper() });
 
-    act(() => { result.current.mutate(mockPreferencePayload); });
+    await waitFor(() => expect(result.current.isLoading).toBe(true));
 
-    await waitFor(() => expect(result.current.isPending).toBe(true));
-
-    act(() => { resolve(mockResponse); });
-    await waitFor(() => expect(result.current.isPending).toBe(false));
+    resolve(mockResponse);
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
   });
 
   it('exposes the error when fetchPreferences rejects', async () => {
     (fetchPreferences as Mock).mockRejectedValue(new Error('AI service unavailable'));
 
     const { result } = renderHook(() => usePreferences(), { wrapper: createWrapper() });
-
-    act(() => { result.current.mutate(mockPreferencePayload); });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
 
