@@ -1,8 +1,8 @@
 import MockAdapter from 'axios-mock-adapter';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { api } from '../services/apiClient';
-import { fetchPreferences, mockPreferencePayload } from './preferencesApi';
-import type { PreferenceResponse } from '../types/copilot';
+import { fetchPreferences, fetchSuburbSummary, mockPreferencePayload } from './preferencesApi';
+import type { PreferenceResponse, SuburbSummaryResponse } from '../types/copilot';
 
 describe('fetchPreferences', () => {
   let mock: MockAdapter;
@@ -44,5 +44,52 @@ describe('fetchPreferences', () => {
     mock.onPost('/ai/preferences').reply(500);
 
     await expect(fetchPreferences(mockPreferencePayload)).rejects.toThrow();
+  });
+});
+
+describe('fetchSuburbSummary', () => {
+  let mock: MockAdapter;
+
+  beforeEach(() => {
+    mock = new MockAdapter(api);
+  });
+
+  afterEach(() => {
+    mock.restore();
+  });
+
+  it('calls POST /ai/suburb-summary with the given suburbs', async () => {
+    mock.onPost('/ai/suburb-summary').reply(200, { suburbs: [] });
+
+    await fetchSuburbSummary(['Bondi Beach', 'Surry Hills']);
+
+    const req = mock.history.post[0];
+    expect(req.url).toBe('/ai/suburb-summary');
+    expect(JSON.parse(req.data)).toEqual({ suburbs: ['Bondi Beach', 'Surry Hills'] });
+  });
+
+  it('returns the structured response data', async () => {
+    const response: SuburbSummaryResponse = {
+      suburbs: [
+        {
+          name: 'Bondi Beach',
+          description: 'A vibrant beach suburb.',
+          rents: { oneBedroom: '$500/wk', twoBedroom: '$800/wk', threeBedroom: null },
+          vacancyRate: '3.1%',
+          trend: 'up 1.5% QoQ',
+        },
+      ],
+    };
+    mock.onPost('/ai/suburb-summary').reply(200, response);
+
+    const result = await fetchSuburbSummary(['Bondi Beach']);
+
+    expect(result).toEqual(response);
+  });
+
+  it('rejects on a 500 response', async () => {
+    mock.onPost('/ai/suburb-summary').reply(500);
+
+    await expect(fetchSuburbSummary(['Bondi Beach'])).rejects.toThrow();
   });
 });

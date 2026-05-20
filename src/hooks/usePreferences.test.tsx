@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { usePreferences } from './usePreferences';
@@ -8,7 +8,7 @@ import type { PreferenceResponse } from '../types/copilot';
 vi.mock('../api/preferencesApi', () => ({
   fetchPreferences: vi.fn(),
   mockPreferencePayload: {
-    suburbs: ['Bondi', 'Bondi Beach', 'Surry Hills'],
+    suburbs: ['Bondi Beach', 'Surry Hills'],
     maxRent: 950,
     minBeds: 2,
     maxBeds: 3,
@@ -39,29 +39,28 @@ const mockResponse: PreferenceResponse = {
 describe('usePreferences', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('auto-fetches on mount and returns data', async () => {
+  it('does not fetch on mount', () => {
+    renderHook(() => usePreferences(), { wrapper: createWrapper() });
+
+    expect(fetchPreferences).not.toHaveBeenCalled();
+  });
+
+  it('fetches and returns data when refetch is called', async () => {
     (fetchPreferences as Mock).mockResolvedValue(mockResponse);
 
     const { result } = renderHook(() => usePreferences(), { wrapper: createWrapper() });
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    act(() => { result.current.refetch(); });
 
+    await waitFor(() => expect(result.current.data).toEqual(mockResponse));
     expect(fetchPreferences).toHaveBeenCalledWith(mockPreferencePayload);
-    expect(result.current.data).toEqual(mockResponse);
   });
 
-  it('sets isLoading true while the request is in flight', async () => {
-    let resolve!: (val: PreferenceResponse) => void;
-    (fetchPreferences as Mock).mockImplementation(
-      () => new Promise<PreferenceResponse>((r) => { resolve = r; }),
-    );
-
+  it('is not loading or fetching on mount', () => {
     const { result } = renderHook(() => usePreferences(), { wrapper: createWrapper() });
 
-    await waitFor(() => expect(result.current.isLoading).toBe(true));
-
-    resolve(mockResponse);
-    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.isFetching).toBe(false);
+    expect(result.current.isLoading).toBe(false);
   });
 
   it('exposes the error when fetchPreferences rejects', async () => {
@@ -69,8 +68,9 @@ describe('usePreferences', () => {
 
     const { result } = renderHook(() => usePreferences(), { wrapper: createWrapper() });
 
-    await waitFor(() => expect(result.current.isError).toBe(true));
+    act(() => { result.current.refetch(); });
 
+    await waitFor(() => expect(result.current.isError).toBe(true));
     expect((result.current.error as Error).message).toBe('AI service unavailable');
   });
 });

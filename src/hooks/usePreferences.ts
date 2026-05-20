@@ -5,5 +5,6 @@ export const usePreferences = () => {
   return useQuery({
     queryKey: ['preferences', mockPreferencePayload],
     queryFn: () => fetchPreferences(mockPreferencePayload),
+    enabled: false,
   });
 };

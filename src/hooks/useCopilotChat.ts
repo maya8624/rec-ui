@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { initialMessages, actionResponses, streamMessage } from '../data/copilot/demoData'
-import type { CopilotMessage } from '../types/copilot'
+import { actionResponses, streamMessage } from '../data/copilot/demoData'
+import type { CopilotMessage, SuburbSummaryResponse } from '../types/copilot'
 
 export function useCopilotChat() {
-  const [messages, setMessages] = useState<CopilotMessage[]>(initialMessages)
+  const [messages, setMessages] = useState<CopilotMessage[]>([])
   const [isStreaming, setIsStreaming] = useState(false)
 
   async function handleSend(userText: string, responseOverride?: string) {
@@ -36,5 +36,21 @@ export function useCopilotChat() {
     handleSend(label)
   }
 
-  return { messages, isStreaming, handleSend, handleAction }
+  function handleSendStructured(userText: string, suburbSummary: SuburbSummaryResponse) {
+    const userMsg: CopilotMessage = { id: crypto.randomUUID(), role: 'user', text: userText }
+    const aiMsg: CopilotMessage = {
+      id: crypto.randomUUID(),
+      role: 'ai',
+      text: '',
+      type: 'suburb-summary',
+      suburbSummary,
+    }
+    setMessages(prev => [...prev, userMsg, aiMsg])
+  }
+
+  function addAiMessage(text: string) {
+    setMessages(prev => [...prev, { id: crypto.randomUUID(), role: 'ai', text }])
+  }
+
+  return { messages, isStreaming, handleSend, handleAction, handleSendStructured, addAiMessage }
 }

@@ -20,7 +20,7 @@ export function LeftColumn({ properties, onAction, disabled, listingsError }: Pr
       <SectionBox label="Map View · Eastern Suburbs">
         <MapPanel />
       </SectionBox>
-      <SectionBox label={`Matched Listings · ${properties.length} Found`}>
+      <SectionBox label={properties.length > 0 ? `Matched Listings · ${properties.length} Found` : 'Matched Listings'}>
         {listingsError && (
           <p className="text-xs text-amber-500 mb-2">
             Something went wrong loading your matches.

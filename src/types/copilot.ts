@@ -34,10 +34,30 @@ export type WorkflowStep = {
   detail: string
 }
 
+export type SuburbRents = {
+  oneBedroom: string | null
+  twoBedroom: string | null
+  threeBedroom: string | null
+}
+
+export type SuburbProfile = {
+  name: string
+  description: string
+  rents: SuburbRents
+  vacancyRate: string | null
+  trend: string | null
+}
+
+export type SuburbSummaryResponse = {
+  suburbs: SuburbProfile[]
+}
+
 export type CopilotMessage = {
   id: string
   role: 'user' | 'ai'
   text: string
   streaming?: boolean
+  type?: 'suburb-summary'
+  suburbSummary?: SuburbSummaryResponse
 }
 

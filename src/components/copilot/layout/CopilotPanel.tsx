@@ -11,16 +11,17 @@ interface Props {
   onAction: (label: string) => void
   onSend: (text: string, responseOverride?: string) => void
   isStreaming: boolean
+  isWaiting?: boolean
 }
 
-export function CopilotPanel({ messages, steps, suggestedSteps, onAction, onSend, isStreaming }: Props) {
+export function CopilotPanel({ messages, steps, suggestedSteps, onAction, onSend, isStreaming, isWaiting }: Props) {
   return (
     <div className="flex flex-col gap-4 w-full md:flex-1 md:sticky md:top-4 md:border-l md:border-slate-200 dark:md:border-slate-700 md:pl-4">
       <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm flex flex-col h-[600px]">
         <p className="text-xs text-slate-400 dark:text-slate-500 uppercase tracking-widest px-4 pt-4 flex-shrink-0">
           Copilot
         </p>
-        <CopilotFeed messages={messages} />
+        <CopilotFeed messages={messages} isWaiting={isWaiting} />
         <CopilotInput onSend={onSend} disabled={isStreaming} />
       </div>
 

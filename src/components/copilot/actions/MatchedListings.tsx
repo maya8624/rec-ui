@@ -5,6 +5,14 @@ interface Props {
 }
 
 export function MatchedListings({ properties }: Props) {
+  if (properties.length === 0) {
+    return (
+      <p className="text-xs text-slate-400 dark:text-slate-500 text-center py-4">
+        Click <span className="font-medium text-slate-500 dark:text-slate-400">Find matching properties</span> to see your matches.
+      </p>
+    )
+  }
+
   return (
     <div className="flex flex-col gap-2">
       {properties.map((p) => (
