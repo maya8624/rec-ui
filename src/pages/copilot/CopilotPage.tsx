@@ -5,12 +5,12 @@ import { CopilotHeader } from '../../components/copilot/layout/CopilotHeader'
 import { LeftColumn } from '../../components/copilot/layout/LeftColumn'
 import { CopilotPanel } from '../../components/copilot/layout/CopilotPanel'
 import { workflowSteps, suggestedSteps } from '../../data/copilot/demoData'
-import { mockPreferencePayload, fetchSuburbSummary } from '../../api/preferencesApi'
+import { fetchSuburbSummary } from '../../api/preferencesApi'
 import type { ListingItem } from '../../types/copilot'
 
 export default function CopilotPage() {
   const { messages, isStreaming, handleSend, handleAction: chatHandleAction, handleSendStructured } = useCopilotChat()
-  const { data, isLoading, isError, refetch } = usePreferences()
+  const { isLoading, isError, refetch } = usePreferences()
   const [properties, setProperties] = useState<ListingItem[]>([])
   const matchesSentRef = useRef(false)
   const [isFetchingSummary, setIsFetchingSummary] = useState(false)
