@@ -36,16 +36,23 @@ export function useCopilotChat() {
     handleSend(label)
   }
 
-  function handleSendStructured(userText: string, suburbSummary: SuburbSummaryResponse) {
+  async function handleSendStructured(userText: string, suburbSummary: SuburbSummaryResponse) {
+    if (isStreaming) return
     const userMsg: CopilotMessage = { id: crypto.randomUUID(), role: 'user', text: userText }
+    const aiId = crypto.randomUUID()
     const aiMsg: CopilotMessage = {
-      id: crypto.randomUUID(),
+      id: aiId,
       role: 'ai',
       text: '',
       type: 'suburb-summary',
       suburbSummary,
+      streaming: true,
     }
     setMessages(prev => [...prev, userMsg, aiMsg])
+    setIsStreaming(true)
+    await new Promise(r => setTimeout(r, 800))
+    setMessages(prev => prev.map(m => (m.id === aiId ? { ...m, streaming: false } : m)))
+    setIsStreaming(false)
   }
 
   function addAiMessage(text: string) {

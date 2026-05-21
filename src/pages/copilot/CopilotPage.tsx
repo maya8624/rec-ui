@@ -13,6 +13,7 @@ export default function CopilotPage() {
   const { isLoading, isError, refetch } = usePreferences()
   const [properties, setProperties] = useState<ListingItem[]>([])
   const matchesSentRef = useRef(false)
+  const suburbSummarySentRef = useRef(false)
   const [isFetchingSummary, setIsFetchingSummary] = useState(false)
 
   async function handleAction(label: string) {
@@ -25,7 +26,8 @@ export default function CopilotPage() {
       return
     }
     if (label === 'Suburb summary') {
-      if (isFetchingSummary || isStreaming) return
+      if (suburbSummarySentRef.current || isFetchingSummary || isStreaming) return
+      suburbSummarySentRef.current = true
       const suburbs = ['Bondi Beach', 'Surry Hills']
       setIsFetchingSummary(true)
       try {
