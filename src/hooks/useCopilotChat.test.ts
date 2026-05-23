@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
 import { useCopilotChat } from './useCopilotChat';
 import type { SuburbSummaryResponse } from '../types/copilot';
 
@@ -50,14 +50,17 @@ describe('useCopilotChat — handleSendStructured', () => {
     expect(aiMsg.suburbSummary).toEqual(mockSuburbData);
   });
 
-  it('does not set isStreaming to true', () => {
+  it('resets isStreaming to false after completion', async () => {
+    vi.useFakeTimers();
     const { result } = renderHook(() => useCopilotChat());
 
-    act(() => {
+    await act(async () => {
       result.current.handleSendStructured('Give me a suburb summary', mockSuburbData);
+      await vi.runAllTimersAsync();
     });
 
     expect(result.current.isStreaming).toBe(false);
+    vi.useRealTimers();
   });
 
   it('adds exactly two messages per call', () => {
