@@ -1,35 +1,31 @@
 import { SectionBox } from './SectionBox'
 import { ActionsPanel } from '../actions/ActionsPanel'
-import { MapPanel } from '../actions/MapPanel'
-import { MatchedListings } from '../actions/MatchedListings'
-import type { ListingItem } from '../../../types/copilot'
+import { SuggestedSteps } from '../chat/SuggestedSteps'
+import { WorkflowTrace } from '../chat/WorkflowTrace'
+import type { WorkflowStep } from '../../../types/copilot'
 
 interface Props {
-  properties: ListingItem[]
   onAction: (label: string) => void
   disabled?: boolean
-  listingsError?: boolean
+  steps: WorkflowStep[]
+  suggestedSteps: string[]
 }
 
-export function LeftColumn({ properties, onAction, disabled, listingsError }: Props) {
+export function LeftColumn({ onAction, disabled, steps, suggestedSteps }: Props) {
   return (
-    <div className="flex flex-col gap-3 w-full md:w-72 md:flex-shrink-0 md:pr-4">
+    <div className="flex flex-col gap-3 w-full md:w-72 md:flex-shrink-0 md:pr-4 md:h-[calc(100vh-120px)] md:overflow-y-auto md:sticky md:top-4 scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
       <SectionBox label="Actions">
         <ActionsPanel onAction={onAction} disabled={disabled} />
       </SectionBox>
-      <SectionBox label="Map View · Eastern Suburbs">
+      <SectionBox label="Suggested Next Steps">
+        <SuggestedSteps steps={suggestedSteps} onAction={onAction} disabled={disabled} />
+      </SectionBox>
+      <SectionBox label="Workflow · Last Run">
+        <WorkflowTrace steps={steps} />
+      </SectionBox>
+      {/* <SectionBox label="Map View · Eastern Suburbs">
         <MapPanel />
-      </SectionBox>
-      <SectionBox label={properties.length > 0 ? `Matched Listings · ${properties.length} Found` : 'Matched Listings'}>
-        {listingsError && (
-          <p className="text-xs text-amber-500 mb-2">
-            Something went wrong loading your matches.
-          </p>
-        )}
-        <div className="max-h-[380px] overflow-y-auto pr-1">
-          <MatchedListings properties={properties} />
-        </div>
-      </SectionBox>
+      </SectionBox> */}
     </div>
   )
 }

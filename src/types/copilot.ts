@@ -10,14 +10,23 @@ export type PreferenceRequest = {
 export type ListingItem = {
   propertyId: string
   listingId: string
-  imageUrl: string
-  addressLine1: string
-  suburb: string
+  listingType: string
+  listingStatus: string
+  price: number
   bedrooms: number
   bathrooms: number
-  price: number
-  buildingSizeSqm: number | null
+  carSpaces: number
+  petFriendly: boolean
   propertyType: string
+  address: string
+  suburb: string
+  state: string
+  postcode: string
+  agentName: string
+  agentPhone: string
+  agencyName: string
+  propertyUrl: string | null
+  imageUrl: string | null
 }
 
 export type PreferenceResponse = {
@@ -59,5 +68,6 @@ export type CopilotMessage = {
   streaming?: boolean
   type?: 'suburb-summary'
   suburbSummary?: SuburbSummaryResponse
+  listings?: ListingItem[]
 }
 

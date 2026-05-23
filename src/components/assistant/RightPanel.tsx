@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import type { RightPanelData } from '../../types/chat';
 import { PropertyResultCard } from './PropertyResultCard';
+import { StreamPropertyCard } from './StreamPropertyCard';
 import { DepositPanel } from '../deposit/DepositPanel';
 
 interface Props {
@@ -29,13 +30,17 @@ export const RightPanel = ({ data, onDismiss }: Props) => (
         data.properties?.map((listing) => (
           <PropertyResultCard key={listing.listingId} listing={listing} />
         ))}
+      {data.type === 'listing-results' &&
+        data.listings.map((listing) => (
+          <StreamPropertyCard key={listing.listing_id} listing={listing} />
+        ))}
       {data.type === 'deposit' && <DepositPanel data={data} />}
     </div>
 
-    {data.type === 'properties' && (
+    {(data.type === 'properties' || data.type === 'listing-results') && (
       <footer className="px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1C1917] shrink-0">
         <p className="text-xs text-gray-400 dark:text-gray-500 text-center">
-          {data.properties?.length ?? 0} properties · click any to view details
+          {data.type === 'listing-results' ? data.listings.length : (data.properties?.length ?? 0)} properties found
         </p>
       </footer>
     )}

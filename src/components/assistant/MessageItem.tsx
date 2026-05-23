@@ -7,16 +7,7 @@ import type { Message } from '../../types/chat';
 
 interface Props {
   message: Message;
-  onLinkClick?: (propertyId: string, href: string, label: string) => void;
   isStreaming?: boolean;
-}
-
-const UUID_RE = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
-
-function extractText(node: React.ReactNode): string {
-  if (typeof node === 'string') return node;
-  if (Array.isArray(node)) return node.map(extractText).join('');
-  return '';
 }
 
 const AssistantAvatar = () => (
@@ -25,7 +16,7 @@ const AssistantAvatar = () => (
   </div>
 );
 
-function AssistantMessage({ message, onLinkClick, isStreaming }: Props) {
+function AssistantMessage({ message, isStreaming }: Props) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(() => {
@@ -92,25 +83,9 @@ function AssistantMessage({ message, onLinkClick, isStreaming }: Props) {
               );
             },
             a: ({ href, children }) => {
-              const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-                if (!onLinkClick || !href) return;
-                const match = href.match(UUID_RE);
-                if (match) {
-                  e.preventDefault();
-                  onLinkClick(match[0], href, extractText(children));
-                }
-              };
-              return (
-                <a
-                  href={href}
-                  onClick={handleClick}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-cyan-600 dark:text-cyan-400 hover:underline cursor-pointer"
-                >
-                  {children}
-                </a>
-              );
+              const text = Array.isArray(children) ? children.join('') : String(children ?? '')
+              if (text === href) return null
+              return <span className="font-medium text-gray-800 dark:text-gray-200">{children}</span>
             },
           }}
         >
@@ -137,7 +112,7 @@ function AssistantMessage({ message, onLinkClick, isStreaming }: Props) {
   );
 }
 
-export const MessageItem = ({ message, onLinkClick, isStreaming }: Props) => {
+export const MessageItem = ({ message, isStreaming }: Props) => {
   if (message.role === 'user') {
     return (
       <div className="flex justify-end">
@@ -148,5 +123,5 @@ export const MessageItem = ({ message, onLinkClick, isStreaming }: Props) => {
     );
   }
 
-  return <AssistantMessage message={message} onLinkClick={onLinkClick} isStreaming={isStreaming} />;
+  return <AssistantMessage message={message} isStreaming={isStreaming} />;
 };

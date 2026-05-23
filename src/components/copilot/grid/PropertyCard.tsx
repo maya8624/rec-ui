@@ -13,8 +13,8 @@ export function PropertyCard({ property, onBook }: Props) {
       <div className="h-24 relative overflow-hidden bg-slate-700">
         {property.imageUrl ? (
           <img
-            src={property.imageUrl}
-            alt={property.addressLine1}
+            src={property.imageUrl ?? ''}
+            alt={property.address}
             className="w-full h-full object-cover"
             loading="lazy"
             onError={(e) => { e.currentTarget.style.display = 'none' }}
@@ -39,7 +39,7 @@ export function PropertyCard({ property, onBook }: Props) {
           ${property.price}
           <span className="text-navy-500 text-xs font-normal">/wk</span>
         </p>
-        <p className="text-sm text-slate-200">{property.addressLine1}</p>
+        <p className="text-sm text-slate-200">{property.address}</p>
         <p className="flex items-center gap-1 text-xs text-navy-500 mt-0.5">
           <MapPin className="w-2.5 h-2.5" />
           {property.suburb}
@@ -53,9 +53,9 @@ export function PropertyCard({ property, onBook }: Props) {
           <span className="flex items-center gap-1">
             <Bath className="w-3 h-3" />{property.bathrooms}
           </span>
-          {property.buildingSizeSqm != null && (
+          {property.carSpaces > 0 && (
             <span className="flex items-center gap-1">
-              <Maximize className="w-3 h-3" />{property.buildingSizeSqm}m²
+              <Maximize className="w-3 h-3" />{property.carSpaces} car
             </span>
           )}
         </div>
@@ -72,7 +72,7 @@ export function PropertyCard({ property, onBook }: Props) {
         {/* Footer */}
         <div className="flex items-center justify-end mt-2 pt-2 border-t border-navy-600">
           <button
-            onClick={() => onBook(property.addressLine1)}
+            onClick={() => onBook(property.address)}
             className="px-2.5 py-1 rounded text-xs border border-gold/40 text-gold bg-gold/10 hover:bg-gold/20 transition-colors cursor-pointer"
           >
             Book

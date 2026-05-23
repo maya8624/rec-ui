@@ -30,7 +30,6 @@ interface Props {
   isLoading: boolean;
   toolStatus?: string;
   error: string | null;
-  onLinkClick?: (propertyId: string, href: string, label: string) => void;
 }
 
 function EmptyState() {
@@ -71,13 +70,7 @@ function SuggestionChip({ label }: { label: string }) {
   );
 }
 
-export const MessageList = ({
-  messages,
-  isLoading,
-  toolStatus,
-  error,
-  onLinkClick,
-}: Props) => {
+export const MessageList = ({ messages, isLoading, toolStatus, error }: Props) => {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -103,7 +96,6 @@ export const MessageList = ({
             <MessageItem
               key={i}
               message={msg}
-              onLinkClick={onLinkClick}
               isStreaming={
                 isLoading &&
                 !toolStatus &&

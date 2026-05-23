@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react'
 import { useCopilotChat } from '../../hooks/useCopilotChat'
-import { usePreferences } from '../../hooks/usePreferences'
 import { CopilotHeader } from '../../components/copilot/layout/CopilotHeader'
 import { LeftColumn } from '../../components/copilot/layout/LeftColumn'
 import { CopilotPanel } from '../../components/copilot/layout/CopilotPanel'
@@ -8,9 +7,10 @@ import { workflowSteps, suggestedSteps } from '../../data/copilot/demoData'
 import { fetchSuburbSummary } from '../../api/preferencesApi'
 import type { ListingItem } from '../../types/copilot'
 
+const FIND_PROPERTIES_MESSAGE = 'Find me a 2 or 3 bedroom pet friendly property in Bondi Beach, Surry Hills under $950/wk available within 14 day'
+
 export default function CopilotPage() {
-  const { messages, isStreaming, handleSend, handleAction: chatHandleAction, handleSendStructured } = useCopilotChat()
-  const { isLoading, isError, refetch } = usePreferences()
+  const { messages, isStreaming, handleSend, handleAction: chatHandleAction, handleSendStructured, handleStreamFromApi } = useCopilotChat()
   const [properties, setProperties] = useState<ListingItem[]>([])
   const matchesSentRef = useRef(false)
   const suburbSummarySentRef = useRef(false)
@@ -20,9 +20,11 @@ export default function CopilotPage() {
     if (label === 'Find matching properties') {
       if (matchesSentRef.current) return
       matchesSentRef.current = true
-      const result = await refetch()
-      setProperties(result.data?.listings ?? [])
-      await handleSend('Find matching properties', result.data?.message)
+      await handleStreamFromApi(
+        FIND_PROPERTIES_MESSAGE,
+        { message: FIND_PROPERTIES_MESSAGE, propertyId: null, threadId: null },
+        (listings) => setProperties(listings),
+      )
       return
     }
     if (label === 'Suburb summary') {
@@ -52,15 +54,19 @@ export default function CopilotPage() {
       <div className="max-w-7xl mx-auto flex flex-col p-4 gap-4">
         <CopilotHeader />
         <div className="flex flex-col md:flex-row items-start">
-          <LeftColumn properties={properties} onAction={handleAction} disabled={isStreaming || isLoading || isFetchingSummary} listingsError={isError} />
-          <CopilotPanel
-            messages={messages}
+          <LeftColumn
+            onAction={handleAction}
+            disabled={isStreaming || isFetchingSummary}
             steps={workflowSteps}
             suggestedSteps={suggestedSteps}
-            onAction={handleAction}
+          />
+          <CopilotPanel
+            messages={messages}
+            properties={properties}
+            listingsError={false}
             onSend={handleSend}
             isStreaming={isStreaming}
-            isWaiting={isLoading || isFetchingSummary}
+            isWaiting={isFetchingSummary}
           />
         </div>
       </div>

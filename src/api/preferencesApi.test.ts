@@ -28,7 +28,7 @@ describe('fetchPreferences', () => {
   it('returns the response data', async () => {
     const response: PreferenceResponse = {
       message: 'Found 2 listings',
-      listings: [{ propertyId: '1', listingId: 'l1', imageUrl: '', addressLine1: '12 Campbell Parade', suburb: 'Bondi', bedrooms: 2, bathrooms: 1, price: 500, buildingSizeSqm: null, propertyType: 'apartment' }],
+      listings: [{ propertyId: '1', listingId: 'l1', listingType: 'rental', listingStatus: 'available', imageUrl: '', address: '12 Campbell Parade', suburb: 'Bondi', state: 'NSW', postcode: '2026', bedrooms: 2, bathrooms: 1, carSpaces: 0, petFriendly: false, price: 500, propertyType: 'apartment', agentName: '', agentPhone: '', agencyName: '', propertyUrl: null }],
       displayCount: 1,
       totalCount: 2,
       hasMore: true,

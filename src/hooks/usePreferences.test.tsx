@@ -29,7 +29,7 @@ function createWrapper() {
 const mockResponse: PreferenceResponse = {
   message: 'Found 2 listings',
   listings: [
-    { listingId: '1', propertyId: 'p1', imageUrl: '', addressLine1: '12 Campbell Parade', suburb: 'Bondi Beach', bedrooms: 2, bathrooms: 1, price: 850, buildingSizeSqm: null, propertyType: 'Apartment' },
+    { listingId: '1', propertyId: 'p1', listingType: 'rental', listingStatus: 'available', imageUrl: '', address: '12 Campbell Parade', suburb: 'Bondi Beach', state: 'NSW', postcode: '2026', bedrooms: 2, bathrooms: 1, carSpaces: 0, petFriendly: true, price: 850, propertyType: 'Apartment', agentName: '', agentPhone: '', agencyName: '', propertyUrl: null },
   ],
   displayCount: 1,
   totalCount: 2,

@@ -1,6 +1,6 @@
 import { api } from "../services/apiClient";
 import { chatRequestSchema } from "../types/chat";
-import type { ChatRequest, ChatResponse } from "../types/chat";
+import type { ChatRequest, ChatResponse, ListingResult } from "../types/chat";
 
 export const sendChatmessage = async (payload: ChatRequest): Promise<ChatResponse> => {
   chatRequestSchema.parse(payload);
@@ -8,11 +8,13 @@ export const sendChatmessage = async (payload: ChatRequest): Promise<ChatRespons
   return res.data;
 };
 
+export type StreamListing = ListingResult
+
 export type StreamEvent =
   | { type: 'token'; content: string }
   | { type: 'tool_start'; tool: string }
   | { type: 'tool_end'; tool: string }
-  | { type: 'result'; thread_id: string | null; listings: Array<{ property_id: string; listing_id: string; property_url: string }>; property_id: string | null }
+  | { type: 'result'; thread_id: string | null; listings: StreamListing[]; property_id: string | null }
   | { type: 'error'; message: string }
   | { type: 'done' };
 

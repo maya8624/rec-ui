@@ -1,10 +1,12 @@
 import type { ListingItem, WorkflowStep, CopilotMessage } from '../../types/copilot'
 
+const baseListing = { listingType: 'rental', listingStatus: 'available', carSpaces: 0, petFriendly: true, state: 'NSW', postcode: '2026', agentName: '', agentPhone: '', agencyName: '', propertyUrl: null }
+
 export const properties: ListingItem[] = [
-  { listingId: '1', propertyId: 'p1', addressLine1: '12 Campbell Parade', suburb: 'Bondi Beach', price: 920, bedrooms: 3, bathrooms: 2, buildingSizeSqm: 95, propertyType: 'Apartment', imageUrl: 'https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=600&h=280&fit=crop&auto=format' },
-  { listingId: '2', propertyId: 'p2', addressLine1: '4/8 Roscoe Street', suburb: 'Bondi', price: 850, bedrooms: 2, bathrooms: 2, buildingSizeSqm: 80, propertyType: 'Apartment', imageUrl: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&h=280&fit=crop&auto=format' },
-  { listingId: '3', propertyId: 'p3', addressLine1: '8/42 Crown Street', suburb: 'Surry Hills', price: 750, bedrooms: 2, bathrooms: 1, buildingSizeSqm: 72, propertyType: 'Apartment', imageUrl: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=600&h=280&fit=crop&auto=format' },
-  { listingId: '4', propertyId: 'p4', addressLine1: '5 Australia Street', suburb: 'Newtown', price: 680, bedrooms: 2, bathrooms: 1, buildingSizeSqm: 65, propertyType: 'House', imageUrl: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&h=280&fit=crop&auto=format' },
+  { ...baseListing, listingId: '1', propertyId: 'p1', address: '12 Campbell Parade', suburb: 'Bondi Beach', price: 920, bedrooms: 3, bathrooms: 2, propertyType: 'Apartment', imageUrl: 'https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=600&h=280&fit=crop&auto=format' },
+  { ...baseListing, listingId: '2', propertyId: 'p2', address: '4/8 Roscoe Street', suburb: 'Bondi', price: 850, bedrooms: 2, bathrooms: 2, propertyType: 'Apartment', imageUrl: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&h=280&fit=crop&auto=format' },
+  { ...baseListing, listingId: '3', propertyId: 'p3', address: '8/42 Crown Street', suburb: 'Surry Hills', price: 750, bedrooms: 2, bathrooms: 1, propertyType: 'Apartment', imageUrl: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=600&h=280&fit=crop&auto=format' },
+  { ...baseListing, listingId: '4', propertyId: 'p4', address: '5 Australia Street', suburb: 'Newtown', price: 680, bedrooms: 2, bathrooms: 1, propertyType: 'House', imageUrl: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&h=280&fit=crop&auto=format' },
 ]
 
 export const initialMessages: CopilotMessage[] = [

@@ -11,6 +11,28 @@ export interface PropertyListing {
   listingId: string;
 }
 
+export interface ListingResult {
+  property_id: string
+  listing_id: string
+  listing_type: string
+  listing_status: string
+  price: number
+  bedrooms: number
+  bathrooms: number
+  car_spaces: number
+  pet_friendly: boolean
+  property_type: string
+  address: string
+  suburb: string
+  state: string
+  postcode: string
+  agent_name: string
+  agent_phone: string
+  agency_name: string
+  property_url: string | null
+  image_url: string | null
+}
+
 // ── Right panel ──────────────────────────────────────────────────────────────
 // Discriminated union — add new panel variants here as the backend supports them.
 // Each variant must have a unique `type` literal so RightPanel can narrow safely.
@@ -36,9 +58,16 @@ export interface DepositPanelData {
 //   bookings: BookingDetail[];
 // }
 
+export interface ListingResultsPanelData {
+  type: 'listing-results';
+  title: string;
+  listings: ListingResult[];
+}
+
 export type RightPanelData =
   | PropertyPanelData
-  | DepositPanelData;
+  | DepositPanelData
+  | ListingResultsPanelData;
   // | BookingPanelData;
 
 // ── API ───────────────────────────────────────────────────────────────────────
