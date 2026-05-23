@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
-import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { useCopilotChat } from './useCopilotChat';
 import type { SuburbSummaryResponse } from '../types/copilot';
 
