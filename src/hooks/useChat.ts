@@ -5,13 +5,13 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { sendChatmessage } from "../api/chatApi";
-import type { ChatRequest } from "../types/chat";
+import type { CopilotRequest } from "../types/chat";
 
 
 export const useChat = () => {
   return (
     useMutation({
-        mutationFn: (payload: ChatRequest) => sendChatmessage(payload),
+        mutationFn: (payload: CopilotRequest) => sendChatmessage(payload),
     })
   )
 }

@@ -74,13 +74,26 @@ export type RightPanelData =
 
 import { z } from 'zod';
 
-export const chatRequestSchema = z.object({
+export const copilotMetadataSchema = z.object({
+  suburbs: z.array(z.string()).nullable().optional(),
+  intent: z.string().nullable().optional(),
+  budgetMax: z.number().int().nullable().optional(),
+  petFriendly: z.boolean().nullable().optional(),
+  bedroomsMin: z.number().int().nullable().optional(),
+  bedroomsMax: z.number().int().nullable().optional(),
+  availableWithinDays: z.number().int().nullable().optional(),
+});
+
+export type CopilotMetadata = z.infer<typeof copilotMetadataSchema>;
+
+export const copilotRequestSchema = z.object({
   message: z.string().min(1, 'Message is required').max(1000, 'Message must be 1000 characters or fewer'),
   propertyId: z.string().uuid().nullable(),
   threadId: z.string().nullable(),
+  metadata: copilotMetadataSchema.nullable().optional(),
 });
 
-export type ChatRequest = z.infer<typeof chatRequestSchema>;
+export type CopilotRequest = z.infer<typeof copilotRequestSchema>;
 
 export interface ChatResponse {
   reply: string;

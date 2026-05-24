@@ -1,4 +1,4 @@
-import { mockPreferencePayload } from '../../../api/preferencesApi'
+import { mockPreferencePayload } from '../../../api/actionApi'
 
 const { suburbs, minBeds, maxBeds, maxRent, petFriendly, availableWithinDays } = mockPreferencePayload
 

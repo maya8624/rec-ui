@@ -1,52 +1,68 @@
-import { useRef, useState } from 'react'
-import { useCopilotChat } from '../../hooks/useCopilotChat'
-import { CopilotHeader } from '../../components/copilot/layout/CopilotHeader'
-import { LeftColumn } from '../../components/copilot/layout/LeftColumn'
-import { CopilotPanel } from '../../components/copilot/layout/CopilotPanel'
-import { workflowSteps, suggestedSteps } from '../../data/copilot/demoData'
-import { fetchSuburbSummary } from '../../api/preferencesApi'
-import type { ListingItem } from '../../types/copilot'
+import { useRef, useState } from "react";
+import { useCopilotChat } from "../../hooks/useCopilotChat";
+import { CopilotHeader } from "../../components/copilot/layout/CopilotHeader";
+import { LeftColumn } from "../../components/copilot/layout/LeftColumn";
+import { CopilotPanel } from "../../components/copilot/layout/CopilotPanel";
+import { workflowSteps, suggestedSteps } from "../../data/copilot/demoData";
+import { mockPreferencePayload } from "../../api/actionApi";
+import type { ListingItem } from "../../types/copilot";
 
-const FIND_PROPERTIES_MESSAGE = 'Find me a 2 or 3 bedroom pet friendly property in Bondi Beach, Surry Hills under $950/wk available within 14 day'
+const FIND_PROPERTIES_MESSAGE =
+  "Find me a 2 or 3 bedroom pet friendly property in Bondi Beach, Surry Hills under $950/wk available within 14 days";
 
 export default function CopilotPage() {
-  const { messages, isStreaming, handleSend, handleAction: chatHandleAction, handleSendStructured, handleStreamFromApi } = useCopilotChat()
-  const [properties, setProperties] = useState<ListingItem[]>([])
-  const matchesSentRef = useRef(false)
-  const suburbSummarySentRef = useRef(false)
-  const [isFetchingSummary, setIsFetchingSummary] = useState(false)
+  const {
+    messages,
+    isStreaming,
+    handleAction: chatHandleAction,
+    handleStreamFromApi,
+  } = useCopilotChat();
+  const [properties, setProperties] = useState<ListingItem[]>([]);
+  const matchesSentRef = useRef(false);
+  const suburbSummarySentRef = useRef(false);
 
   async function handleAction(label: string) {
-    if (label === 'Find matching properties') {
-      if (matchesSentRef.current) return
-      matchesSentRef.current = true
+    if (label === "Find matching properties") {
+      if (matchesSentRef.current) return;
+      matchesSentRef.current = true;
       await handleStreamFromApi(
         FIND_PROPERTIES_MESSAGE,
-        { message: FIND_PROPERTIES_MESSAGE, propertyId: null, threadId: null },
+        {
+          message: FIND_PROPERTIES_MESSAGE,
+          propertyId: null,
+          threadId: null,
+          metadata: {
+            intent: null,
+            suburbs: mockPreferencePayload.suburbs,
+            budgetMax: mockPreferencePayload.maxRent,
+            petFriendly: mockPreferencePayload.petFriendly,
+            bedroomsMin: mockPreferencePayload.minBeds,
+            bedroomsMax: mockPreferencePayload.maxBeds,
+            availableWithinDays: mockPreferencePayload.availableWithinDays,
+          },
+        },
         (listings) => setProperties(listings),
-      )
-      return
+      );
+      return;
     }
-    if (label === 'Suburb summary') {
-      if (suburbSummarySentRef.current || isFetchingSummary || isStreaming) return
-      suburbSummarySentRef.current = true
-      const suburbs = ['Bondi Beach', 'Surry Hills']
-      setIsFetchingSummary(true)
-      try {
-        const result = await fetchSuburbSummary(suburbs)
-        if (result.suburbs?.length) {
-          handleSendStructured(`Give me a suburb summary for ${suburbs.join(', ')}`, result)
-        } else {
-          await handleSend(`Give me a suburb summary for ${suburbs.join(', ')}`, 'Suburb summary is not available yet.')
-        }
-      } catch {
-        await handleSend(`Give me a suburb summary for ${suburbs.join(', ')}`, 'Failed to load suburb summary. Please try again.')
-      } finally {
-        setIsFetchingSummary(false)
-      }
-      return
+    if (label === "Suburb summary") {
+      if (suburbSummarySentRef.current || isStreaming) return;
+      suburbSummarySentRef.current = true;
+      const suburbs = mockPreferencePayload.suburbs;
+      const message = `Give me a suburb summary for ${suburbs.join(", ")}`;
+      await handleStreamFromApi(
+        message,
+        {
+          message,
+          propertyId: null,
+          threadId: null,
+          metadata: { intent: "suburb_summary", suburbs },
+        },
+        () => {},
+      );
+      return;
     }
-    chatHandleAction(label)
+    chatHandleAction(label);
   }
 
   return (
@@ -56,7 +72,7 @@ export default function CopilotPage() {
         <div className="flex flex-col md:flex-row items-start">
           <LeftColumn
             onAction={handleAction}
-            disabled={isStreaming || isFetchingSummary}
+            disabled={isStreaming}
             steps={workflowSteps}
             suggestedSteps={suggestedSteps}
           />
@@ -64,12 +80,11 @@ export default function CopilotPage() {
             messages={messages}
             properties={properties}
             listingsError={false}
-            onSend={handleSend}
+            onSend={(text) => handleStreamFromApi(text, { message: text, propertyId: null, threadId: null }, () => {})}
             isStreaming={isStreaming}
-            isWaiting={isFetchingSummary}
           />
         </div>
       </div>
     </div>
-  )
+  );
 }

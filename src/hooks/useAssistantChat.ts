@@ -3,7 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import { sendChatmessage } from '../api/chatApi';
 import { detectPanelData } from '../utils/chatPanelUtils';
 import { extractErrorMessage } from '../utils/errorUtils';
-import type { Message, ChatRequest, RightPanelData } from '../types/chat';
+import type { Message, CopilotRequest, RightPanelData } from '../types/chat';
 
 interface UseAssistantChatReturn {
   messages: Message[];
@@ -23,7 +23,7 @@ export function useAssistantChat(): UseAssistantChatReturn {
   const [error, setError] = useState<string | null>(null);
 
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: (payload: ChatRequest) => sendChatmessage(payload),
+    mutationFn: (payload: CopilotRequest) => sendChatmessage(payload),
   });
 
   const sendMessage = useCallback(

@@ -7,7 +7,7 @@ interface Props {
   messages: CopilotMessage[]
   properties: ListingItem[]
   listingsError?: boolean
-  onSend: (text: string, responseOverride?: string) => void
+  onSend: (text: string) => void
   isStreaming: boolean
   isWaiting?: boolean
 }

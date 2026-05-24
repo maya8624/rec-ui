@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { actionResponses, streamMessage } from '../data/copilot/demoData'
 import { streamChatMessage } from '../api/chatApi'
-import type { ChatRequest } from '../types/chat'
+import type { CopilotRequest } from '../types/chat'
 import type { CopilotMessage, ListingItem, SuburbSummaryResponse } from '../types/copilot'
+
 
 export function useCopilotChat() {
   const [messages, setMessages] = useState<CopilotMessage[]>([])
   const [isStreaming, setIsStreaming] = useState(false)
+  const [threadId, setThreadId] = useState<string | null>(null)
 
   async function handleSend(userText: string, responseOverride?: string) {
     if (isStreaming) return
@@ -59,7 +61,7 @@ export function useCopilotChat() {
 
   async function handleStreamFromApi(
     userText: string,
-    payload: ChatRequest,
+    payload: CopilotRequest,
     onListings: (listings: ListingItem[]) => void,
     signal?: AbortSignal,
   ): Promise<void> {
@@ -72,13 +74,14 @@ export function useCopilotChat() {
 
     try {
       await streamChatMessage(
-        payload,
+        { ...payload, threadId },
         (event) => {
           if (event.type === 'token') {
             setMessages(prev =>
               prev.map(m => m.id === aiId ? { ...m, text: m.text + event.content } : m)
             )
           } else if (event.type === 'result') {
+            if (event.thread_id) setThreadId(event.thread_id)
             const listings: ListingItem[] = event.listings.map(l => ({
               propertyId: l.property_id,
               listingId: l.listing_id,

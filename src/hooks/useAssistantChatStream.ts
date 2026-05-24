@@ -3,7 +3,7 @@ import axios from 'axios';
 import { streamChatMessage } from '../api/chatApi';
 import { detectPanelData } from '../utils/chatPanelUtils';
 import { extractErrorMessage } from '../utils/errorUtils';
-import type { Message, ChatRequest, RightPanelData } from '../types/chat';
+import type { Message, CopilotRequest, RightPanelData } from '../types/chat';
 
 
 interface UseAssistantChatReturn {
@@ -85,7 +85,7 @@ export function useAssistantChatStream(): UseAssistantChatReturn {
       setIsPending(true);
 
       abortRef.current = new AbortController();
-      const payload: ChatRequest = { message: content, propertyId: null, threadId };
+      const payload: CopilotRequest = { message: content, propertyId: null, threadId };
 
       try {
         await streamChatMessage(
