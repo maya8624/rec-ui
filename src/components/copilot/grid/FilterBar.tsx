@@ -2,7 +2,7 @@ import { Bed, DollarSign, MapPin } from 'lucide-react'
 
 export function FilterBar() {
   return (
-    <div className="flex items-center gap-2 px-4 py-2.5 border-b border-navy-600 overflow-x-auto flex-shrink-0 scrollbar-none">
+    <div className="flex items-center gap-2 px-4 py-2.5 border-b border-navy-600 overflow-x-auto flex-shrink-0 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-200 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700">
       {/* Filter selects */}
       <div className="flex items-center gap-1.5 border border-gold/40 text-gold bg-gold/10 rounded-lg px-2.5 py-1.5 text-xs cursor-pointer shrink-0">
         <Bed className="w-3 h-3" />

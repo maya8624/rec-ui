@@ -48,7 +48,7 @@ export function UploadPanel({ uploads, isUploading, error, onUpload }: Props) {
 
   return (
     <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm overflow-hidden md:flex-1 md:min-h-0 md:flex md:flex-col">
-      <div className="p-5 space-y-5 md:flex-1 md:min-h-0 md:overflow-y-auto">
+      <div className="p-5 space-y-5 md:flex-1 md:min-h-0 md:overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-200 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700">
         <div
           onDragEnter={e => { e.preventDefault(); setIsDragging(true) }}
           onDragOver={e => { e.preventDefault(); setIsDragging(true) }}

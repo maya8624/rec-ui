@@ -4,16 +4,20 @@ import { AgentSidebar } from '../../components/agent/layout/AgentSidebar'
 import { EnquiryDetail } from '../../components/agent/enquiry/EnquiryDetail'
 import { DocSearchPanel } from '../../components/agent/documents/DocSearchPanel'
 import { UploadPanel } from '../../components/agent/upload/UploadPanel'
+import { useAgentEnquiries } from '../../hooks/useAgentEnquiries'
 import { useEnquiryDraft } from '../../hooks/useEnquiryDraft'
 import { useFileUpload } from '../../hooks/useFileUpload'
-import { enquiries } from '../../data/agent/demoData'
 import type { AgentTab } from '../../types/agent'
 
 export default function AgentDashboard() {
   const [activeTab, setActiveTab] = useState<AgentTab>('enquiry')
-  const [selectedEnquiryId, setSelectedEnquiryId] = useState<string | null>(enquiries[0]?.id ?? null)
-  const enquiryDraft = useEnquiryDraft(selectedEnquiryId)
+  const [selectedEnquiryId, setSelectedEnquiryId] = useState<string | null>(null)
+
+  const { enquiries, isLoading: enquiriesLoading, error: enquiriesError, updateEnquiryStatus } = useAgentEnquiries()
   const fileUpload = useFileUpload()
+
+  const selectedEnquiry = enquiries.find(e => e.id === selectedEnquiryId) ?? null
+  const enquiryDraft = useEnquiryDraft(selectedEnquiry, updateEnquiryStatus) // onStatusChange
 
   return (
     <div className="min-h-screen md:h-screen md:overflow-hidden bg-slate-100 dark:bg-slate-900 flex flex-col">
@@ -23,15 +27,19 @@ export default function AgentDashboard() {
           <AgentSidebar
             activeTab={activeTab}
             onTabChange={setActiveTab}
+            enquiries={enquiries}
+            enquiriesLoading={enquiriesLoading}
+            enquiriesError={enquiriesError}
             selectedEnquiryId={selectedEnquiryId}
             onSelectEnquiry={setSelectedEnquiryId}
             uploads={fileUpload.uploads}
+            isGenerating={enquiryDraft.isLoading}
           />
           <div className="md:flex-1 md:min-h-0 md:flex md:flex-col md:border-l md:border-slate-200 dark:md:border-slate-700 md:pl-4">
             {activeTab === 'enquiry' && (
               <EnquiryDetail
                 key={selectedEnquiryId}
-                enquiryId={selectedEnquiryId}
+                enquiry={selectedEnquiry}
                 draft={enquiryDraft}
               />
             )}

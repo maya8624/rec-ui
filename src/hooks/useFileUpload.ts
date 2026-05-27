@@ -1,6 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { uploadDocument, fetchUploadStatus } from '../api/agentApi'
-import { recentUploads as initialUploads } from '../data/agent/demoData'
 import type { UploadedFile } from '../types/agent'
 
 const MAX_FILE_MB = 20
@@ -11,7 +10,7 @@ const ALLOWED_TYPES = [
 ]
 
 export function useFileUpload() {
-  const [uploads, setUploads] = useState<UploadedFile[]>(initialUploads)
+  const [uploads, setUploads] = useState<UploadedFile[]>([])
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const pollRefs = useRef<Record<string, ReturnType<typeof setInterval>>>({})

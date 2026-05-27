@@ -25,7 +25,7 @@ export function CopilotFeed({ messages, isWaiting, isStreaming }: Props) {
   const showIndicator = isWaiting || (isStreaming && visibleMessages.length < messages.length)
 
   return (
-    <div className="flex-1 overflow-y-auto flex flex-col gap-3 min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+    <div className="flex-1 overflow-y-auto flex flex-col gap-3 min-h-0 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-200 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700">
       <PreferenceSummaryCard />
       <div className="flex flex-col gap-3 px-4 pb-4">
         {visibleMessages.map((msg) =>

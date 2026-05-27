@@ -85,7 +85,7 @@ export const MessageList = ({ messages, isLoading, toolStatus, error }: Props) =
   const isEmpty = visibleMessages.length === 0 && !isLoading;
 
   return (
-    <div className="flex-1 min-h-0 overflow-y-auto">
+    <div className="flex-1 min-h-0 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-200 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700">
       {isEmpty ? (
         <div className="h-full flex items-center justify-center">
           <EmptyState />
