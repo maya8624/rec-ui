@@ -7,7 +7,6 @@ import type {
   EnquiryStatus,
   EnquirySendResponse,
   IndexedDocument,
-  DocSearchResponse,
   UploadedFile,
 } from '../types/agent'
 
@@ -59,11 +58,6 @@ export async function sendEnquiryReply(id: string): Promise<EnquirySendResponse>
 
 export async function fetchDocuments(): Promise<IndexedDocument[]> {
   const { data } = await api.get<IndexedDocument[]>('/agent/documents')
-  return data
-}
-
-export async function searchDocuments(query: string): Promise<DocSearchResponse> {
-  const { data } = await api.post<DocSearchResponse>('/agent/documents/search', { query })
   return data
 }
 

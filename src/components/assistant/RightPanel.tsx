@@ -1,6 +1,6 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+﻿import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
-import type { RightPanelData } from '../../types/chat';
+import type { RightPanelData } from '../../types/copilot';
 import { PropertyResultCard } from './PropertyResultCard';
 import { StreamPropertyCard } from './StreamPropertyCard';
 import { DepositPanel } from '../deposit/DepositPanel';
@@ -46,3 +46,4 @@ export const RightPanel = ({ data, onDismiss }: Props) => (
     )}
   </aside>
 );
+

@@ -1,7 +1,7 @@
-
+﻿
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBed, faBath, faCar } from '@fortawesome/free-solid-svg-icons';
-import type { PropertyListing } from '../../types/chat';
+import type { PropertyListing } from '../../types/copilot';
 import { formatPrice } from '../../utils/formatPrice';
 import { useProperty } from '../../hooks/useProperties';
 
@@ -80,3 +80,4 @@ export const PropertyResultCard = ({ listing }: Props) => {
     </a>
   );
 };
+

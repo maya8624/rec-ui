@@ -1,4 +1,4 @@
-import type { Message } from '../../types/chat';
+﻿import type { Message } from '../../types/copilot';
 import { MessageList } from './MessageList';
 import { ChatInput } from './ChatInput';
 
@@ -16,3 +16,4 @@ export const ConversationPanel = ({ messages, isLoading, toolStatus, error, onSe
     <ChatInput onSend={onSend} disabled={isLoading} />
   </div>
 );
+

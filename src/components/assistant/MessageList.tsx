@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import type { Message } from "../../types/chat";
+﻿import { useEffect, useRef } from "react";
+import type { Message } from "../../types/copilot";
 import { MessageItem } from "./MessageItem";
 import { TypingIndicator } from "./TypingIndicator";
 
@@ -77,7 +77,7 @@ export const MessageList = ({ messages, isLoading, toolStatus, error }: Props) =
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading, toolStatus]);
 
-  // Filter out the empty assistant placeholder — the tool/typing indicator covers it
+  // Filter out the empty assistant placeholder â€” the tool/typing indicator covers it
   const visibleMessages = messages.filter(
     (msg) => msg.role !== "assistant" || msg.content.length > 0,
   );
@@ -120,3 +120,4 @@ export const MessageList = ({ messages, isLoading, toolStatus, error }: Props) =
     </div>
   );
 };
+

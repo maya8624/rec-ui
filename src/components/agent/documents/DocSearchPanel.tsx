@@ -1,41 +1,33 @@
 import { useState, useRef, useEffect } from 'react'
 import { Send, Loader2 } from 'lucide-react'
-import { WorkflowFooter } from '../layout/WorkflowFooter'
 import { useDocumentSearch } from '../../../hooks/useDocumentSearch'
-import { suggestedQuestions, docSearchWorkflowSteps } from '../../../data/agent/demoData'
-import type { SourceNode, DocType } from '../../../types/agent'
+import type { SourceChunk } from '../../../types/agent'
 
-function citationClass(type: DocType) {
-  if (type === 'pdf') return 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/20'
-  if (type === 'docx') return 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20'
-  return 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-600'
-}
-
-function CitationChip({ node }: { node: SourceNode }) {
+function CitationChip({ chunk }: { chunk: SourceChunk }) {
   return (
-    <span className={`inline-flex items-center text-xs px-2 py-0.5 rounded-full ${citationClass(node.type)}`}>
-      {node.source} · p.{node.page}
+    <span className="inline-flex items-center text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-600">
+      {chunk.fileName}{chunk.page != null ? ` · p.${chunk.page}` : ''}
     </span>
   )
 }
 
-function SourceCard({ node }: { node: SourceNode }) {
+function SourceCard({ chunk }: { chunk: SourceChunk }) {
   return (
     <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-3">
       <div className="flex items-center justify-between gap-2 mb-1.5">
-        <span className="text-xs font-medium text-slate-700 dark:text-slate-300 truncate">{node.source}</span>
+        <span className="text-xs font-medium text-slate-700 dark:text-slate-300 truncate">{chunk.fileName}</span>
         <div className="flex items-center gap-2 flex-shrink-0">
-          <span className="text-xs text-slate-400 dark:text-slate-500">p.{node.page}</span>
-          <span className="text-xs text-emerald-600 dark:text-emerald-400">{Math.round(node.score * 100)}%</span>
+          {chunk.page != null && <span className="text-xs text-slate-400 dark:text-slate-500">p.{chunk.page}</span>}
+          <span className="text-xs text-emerald-600 dark:text-emerald-400">{Math.round(chunk.score * 100)}%</span>
         </div>
       </div>
-      <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">{node.text}</p>
+      <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">{chunk.text}</p>
     </div>
   )
 }
 
 export function DocSearchPanel() {
-  const { messages, isSearching, error, search } = useDocumentSearch()
+  const { messages, isLoading, error, search } = useDocumentSearch()
   const [input, setInput] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
 
@@ -44,7 +36,7 @@ export function DocSearchPanel() {
   }, [messages])
 
   function handleSend() {
-    if (!input.trim() || isSearching) return
+    if (!input.trim() || isLoading) return
     search(input.trim())
     setInput('')
   }
@@ -68,13 +60,13 @@ export function DocSearchPanel() {
                   AI
                 </span>
                 <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{msg.content}</p>
-                {msg.sourceNodes && msg.sourceNodes.length > 0 && (
+                {msg.sources && msg.sources.length > 0 && (
                   <>
                     <div className="flex flex-wrap gap-1.5">
-                      {msg.sourceNodes.map((node, i) => <CitationChip key={i} node={node} />)}
+                      {msg.sources.map((chunk, i) => <CitationChip key={i} chunk={chunk} />)}
                     </div>
                     <div className="space-y-2">
-                      {msg.sourceNodes.map((node, i) => <SourceCard key={i} node={node} />)}
+                      {msg.sources.map((chunk, i) => <SourceCard key={i} chunk={chunk} />)}
                     </div>
                   </>
                 )}
@@ -82,7 +74,7 @@ export function DocSearchPanel() {
             )}
           </div>
         ))}
-        {isSearching && (
+        {isLoading && (
           <div className="flex items-center gap-2 text-slate-400">
             <Loader2 className="w-4 h-4 animate-spin" />
             <span className="text-xs">Searching documents…</span>
@@ -90,19 +82,6 @@ export function DocSearchPanel() {
         )}
         {error && <p className="text-xs text-red-500">{error}</p>}
         <div ref={bottomRef} />
-      </div>
-
-      <div className="flex-shrink-0 px-5 pb-2 flex flex-wrap gap-1.5">
-        {suggestedQuestions.map((q, i) => (
-          <button
-            key={i}
-            onClick={() => search(q)}
-            disabled={isSearching}
-            className="text-xs px-2.5 py-1 rounded-full border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:border-slate-300 dark:hover:border-slate-500 transition-colors disabled:opacity-50"
-          >
-            {q}
-          </button>
-        ))}
       </div>
 
       <div className="flex-shrink-0 px-5 pb-4">
@@ -113,19 +92,17 @@ export function DocSearchPanel() {
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKey}
-            disabled={isSearching}
+            disabled={isLoading}
           />
           <button
             onClick={handleSend}
-            disabled={isSearching || !input.trim()}
+            disabled={isLoading || !input.trim()}
             className="w-7 h-7 rounded-lg bg-gold flex items-center justify-center disabled:opacity-40 hover:opacity-90 transition-opacity"
           >
             <Send className="w-3.5 h-3.5 text-navy-900" />
           </button>
         </div>
       </div>
-
-      <WorkflowFooter steps={docSearchWorkflowSteps} />
     </div>
   )
 }

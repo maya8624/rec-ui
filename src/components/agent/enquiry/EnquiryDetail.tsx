@@ -96,9 +96,9 @@ export function EnquiryDetail({ enquiry, draft }: Props) {
                 <div className="px-4 pb-3 border-t border-slate-200 dark:border-slate-700 pt-3 flex-shrink-0">
                   <p className="text-xs text-slate-400 dark:text-slate-500 mb-1.5">Context sources</p>
                   <div className="flex flex-wrap gap-1.5">
-                    {draft.draft.sources.map((src, i) => (
+                    {draft.draft.sources.map((chunk, i) => (
                       <span key={i} className="text-xs px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400">
-                        {src}
+                        {chunk.fileName}
                       </span>
                     ))}
                   </div>

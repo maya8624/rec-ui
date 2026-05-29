@@ -1,4 +1,4 @@
-import type { DepositPanelData } from '../types/chat';
+﻿import type { DepositPanelData } from '../types/copilot';
 
 const DEPOSIT_INTENT_KEYWORDS = [
   'deposit', 'pay deposit', 'make a deposit', 'paying deposit',
@@ -21,3 +21,4 @@ export function detectPanelData(userMessage: string): DepositPanelData | null {
 
   return null;
 }
+

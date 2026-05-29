@@ -1,6 +1,4 @@
-import { useState, useEffect } from 'react'
 import { FileText, File, AlignLeft } from 'lucide-react'
-import { fetchDocuments } from '../../../api/agentApi'
 import { ragContextInfo } from '../../../data/agent/demoData'
 import type { IndexedDocument, DocType } from '../../../types/agent'
 
@@ -11,11 +9,7 @@ function DocIcon({ type }: { type: DocType }) {
 }
 
 export function DocumentList() {
-  const [docs, setDocs] = useState<IndexedDocument[]>([])
-
-  useEffect(() => {
-    fetchDocuments().then(setDocs).catch(() => {})
-  }, [])
+  const docs: IndexedDocument[] = []
 
   return (
     <div>

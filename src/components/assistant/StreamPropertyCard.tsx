@@ -1,6 +1,6 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+﻿import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBed, faBath, faCar, faPaw } from '@fortawesome/free-solid-svg-icons';
-import type { ListingResult } from '../../types/chat';
+import type { ListingResult } from '../../types/copilot';
 
 interface Props {
   listing: ListingResult;
@@ -71,7 +71,7 @@ export const StreamPropertyCard = ({ listing }: Props) => {
         {listing.agency_name && (
           <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1.5 truncate">
             {listing.agency_name}
-            {listing.agent_name ? ` · ${listing.agent_name}` : ''}
+            {listing.agent_name ? ` Â· ${listing.agent_name}` : ''}
           </p>
         )}
       </div>
@@ -84,3 +84,4 @@ export const StreamPropertyCard = ({ listing }: Props) => {
     </a>
   );
 };
+

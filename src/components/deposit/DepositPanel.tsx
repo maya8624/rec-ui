@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faSpinner,
@@ -6,7 +6,7 @@ import {
   faTriangleExclamation,
   faHouse,
 } from '@fortawesome/free-solid-svg-icons';
-import type { DepositPanelData } from '../../types/chat';
+import type { DepositPanelData } from '../../types/copilot';
 import { useDeposit } from '../../hooks/useDeposit';
 
 interface Props {
@@ -128,3 +128,4 @@ export const DepositPanel = ({ data }: Props) => {
     </form>
   );
 };
+

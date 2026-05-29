@@ -1,9 +1,9 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+﻿import { useState, useCallback, useRef, useEffect } from 'react';
 import axios from 'axios';
-import { streamChatMessage } from '../api/chatApi';
+import { streamChatMessage } from '../api/copilotApi';
 import { detectPanelData } from '../utils/chatPanelUtils';
 import { extractErrorMessage } from '../utils/errorUtils';
-import type { Message, CopilotRequest, RightPanelData } from '../types/chat';
+import type { Message, CopilotRequest, RightPanelData } from '../types/copilot';
 
 
 interface UseAssistantChatReturn {
@@ -55,7 +55,7 @@ export function useAssistantChatStream(): UseAssistantChatReturn {
         requestAnimationFrame(tick);
         return;
       }
-      // Queue empty — trigger panel detection if stream is done
+      // Queue empty â€” trigger panel detection if stream is done
       renderingRef.current = false;
       if (pendingPanelContentRef.current !== null) {
         const msg = pendingPanelContentRef.current;
@@ -183,3 +183,4 @@ export function useAssistantChatStream(): UseAssistantChatReturn {
     startNewChat,
   };
 }
+

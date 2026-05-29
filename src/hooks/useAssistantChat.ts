@@ -1,9 +1,9 @@
-import { useState, useCallback } from 'react';
+﻿import { useState, useCallback } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { sendChatmessage } from '../api/chatApi';
+import { sendChatmessage } from '../api/copilotApi';
 import { detectPanelData } from '../utils/chatPanelUtils';
 import { extractErrorMessage } from '../utils/errorUtils';
-import type { Message, CopilotRequest, RightPanelData } from '../types/chat';
+import type { Message, CopilotRequest, RightPanelData } from '../types/copilot';
 
 interface UseAssistantChatReturn {
   messages: Message[];
@@ -85,3 +85,4 @@ export function useAssistantChat(): UseAssistantChatReturn {
     startNewChat,
   };
 }
+

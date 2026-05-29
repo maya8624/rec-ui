@@ -1,8 +1,8 @@
-import { api } from "../services/apiClient";
-import { copilotRequestSchema } from "../types/chat";
-import type { CopilotRequest, ChatResponse, ListingResult } from "../types/chat";
+﻿import { api } from "../services/apiClient";
+import { copilotRequestSchema } from "../types/copilot";
+import type { CopilotRequest, CopilotResponse, ListingResult } from "../types/copilot";
 
-export const sendChatmessage = async (payload: CopilotRequest): Promise<ChatResponse> => {
+export const sendChatmessage = async (payload: CopilotRequest): Promise<CopilotResponse> => {
   copilotRequestSchema.parse(payload);
   const res = await api.post("/ai/copilot", payload);
   return res.data;
@@ -71,3 +71,4 @@ export const getHistory = async (sessionId: string) => {
   const res = await api.get(`/ai/history?sessionId=${sessionId}`);
   return res.data;
 };
+

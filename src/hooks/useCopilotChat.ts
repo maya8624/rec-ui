@@ -1,7 +1,7 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { actionResponses, streamMessage } from '../data/copilot/demoData'
-import { streamChatMessage } from '../api/chatApi'
-import type { CopilotRequest } from '../types/chat'
+import { streamChatMessage } from '../api/copilotApi'
+import type { CopilotRequest } from '../types/copilot'
 import type { CopilotMessage, ListingItem, SuburbSummaryResponse } from '../types/copilot'
 
 
@@ -133,3 +133,4 @@ export function useCopilotChat() {
 
   return { messages, isStreaming, handleSend, handleAction, handleSendStructured, handleStreamFromApi, addAiMessage }
 }
+

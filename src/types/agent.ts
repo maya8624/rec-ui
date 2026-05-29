@@ -43,7 +43,7 @@ export interface EnquirySendResponse {
 
 export interface EnquiryDraft {
   draft: string
-  sources: string[]
+  sources: SourceChunk[]
   status: string        // returned by backend after saving — e.g. "Drafted"
 }
 
@@ -62,24 +62,18 @@ export interface RagContextInfo {
   tenant: string
 }
 
-export interface SourceNode {
-  source: string
-  page: number
+export interface SourceChunk {
+  fileName: string
+  page: number | null
   score: number
   text: string
-  type: DocType
-}
-
-export interface DocSearchResponse {
-  answer: string
-  source_nodes: SourceNode[]
 }
 
 export interface DocMessage {
   id: string
   role: 'user' | 'ai'
   content: string
-  sourceNodes?: SourceNode[]
+  sources?: SourceChunk[]
 }
 
 export type UploadStatus = 'indexed' | 'processing' | 'error'

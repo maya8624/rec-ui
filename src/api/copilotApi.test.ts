@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
-import { streamChatMessage, type StreamEvent } from './chatApi';
+import { streamChatMessage, type StreamEvent } from './copilotApi';
 import { api } from '../services/apiClient';
 
 vi.mock('../services/apiClient', () => ({

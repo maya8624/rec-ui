@@ -1,10 +1,10 @@
 import { act, renderHook } from '@testing-library/react';
 import axios from 'axios';
 import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
-import { streamChatMessage } from '../api/chatApi';
+import { streamChatMessage } from '../api/copilotApi';
 import { useAssistantChatStream } from './useAssistantChatStream';
 
-vi.mock('../api/chatApi', () => ({ streamChatMessage: vi.fn() }));
+vi.mock('../api/copilotApi', () => ({ streamChatMessage: vi.fn() }));
 vi.mock('../utils/chatPanelUtils', () => ({ detectPanelData: vi.fn().mockReturnValue(null) }));
 
 describe('useAssistantChatStream', () => {

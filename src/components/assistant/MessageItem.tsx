@@ -1,9 +1,9 @@
-import { useState, useCallback } from 'react';
+﻿import { useState, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCopy, faCheck } from '@fortawesome/free-solid-svg-icons';
-import type { Message } from '../../types/chat';
+import type { Message } from '../../types/copilot';
 
 interface Props {
   message: Message;
@@ -125,3 +125,4 @@ export const MessageItem = ({ message, isStreaming }: Props) => {
 
   return <AssistantMessage message={message} isStreaming={isStreaming} />;
 };
+

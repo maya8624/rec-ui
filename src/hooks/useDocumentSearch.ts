@@ -1,30 +1,29 @@
 import { useState, useCallback } from 'react'
-import { searchDocuments } from '../api/agentApi'
-import { initialDocMessages } from '../data/agent/demoData'
+import { sendChatmessage } from '../api/copilotApi'
 import type { DocMessage } from '../types/agent'
 
 export function useDocumentSearch() {
-  const [messages, setMessages] = useState<DocMessage[]>(initialDocMessages)
-  const [isSearching, setIsSearching] = useState(false)
+  const [messages, setMessages] = useState<DocMessage[]>([])
+  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const search = useCallback(async (query: string) => {
-    if (isSearching || !query.trim()) return
+    if (isLoading || !query.trim()) return
     setMessages(prev => [...prev, { id: crypto.randomUUID(), role: 'user', content: query }])
-    setIsSearching(true)
+    setIsLoading(true)
     setError(null)
     try {
-      const res = await searchDocuments(query)
+      const res = await sendChatmessage({ message: query, propertyId: null, threadId: null })
       setMessages(prev => [
         ...prev,
-        { id: crypto.randomUUID(), role: 'ai', content: res.answer, sourceNodes: res.source_nodes },
+        { id: crypto.randomUUID(), role: 'ai', content: res.reply, sources: res.sources ?? [] },
       ])
     } catch {
       setError('Search failed. Please try again.')
     } finally {
-      setIsSearching(false)
+      setIsLoading(false)
     }
-  }, [isSearching])
+  }, [isLoading])
 
-  return { messages, isSearching, error, search }
+  return { messages, isLoading, error, search }
 }
