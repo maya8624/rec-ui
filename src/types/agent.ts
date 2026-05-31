@@ -2,6 +2,13 @@ export type AgentTab = 'enquiry' | 'documents' | 'upload'
 
 export type EnquiryStatus = 'new' | 'drafted' | 'replied' | 'closed'
 
+export interface SourceChunk {
+  fileName: string
+  page: number | null
+  score: number
+  text: string
+}
+
 // Raw shape from GET /enquiry/agent
 export interface ApiEnquiry {
   id: string
@@ -10,6 +17,7 @@ export interface ApiEnquiry {
   agentId: string
   body: string
   draftReply: string | null
+  draftSources: SourceChunk[]
   sentReply: string | null
   status: string
   senderName: string | null
@@ -29,6 +37,7 @@ export interface Enquiry {
   status: EnquiryStatus
   propertyId: string
   draftReply: string | null
+  draftSources: SourceChunk[]
   sentReply: string | null
 }
 
@@ -41,10 +50,18 @@ export interface EnquirySendResponse {
   repliedAtUtc: string
 }
 
+// Raw shape from POST /ai/enquiry-draft
+export interface ApiEnquiryDraft {
+  draft: string
+  draftSources: SourceChunk[]
+  status: string
+}
+
+// Internal UI model — sources normalised from ApiEnquiryDraft.draftSources
 export interface EnquiryDraft {
   draft: string
   sources: SourceChunk[]
-  status: string        // returned by backend after saving — e.g. "Drafted"
+  status: string
 }
 
 export type DocType = 'pdf' | 'docx' | 'txt'
@@ -62,18 +79,12 @@ export interface RagContextInfo {
   tenant: string
 }
 
-export interface SourceChunk {
-  fileName: string
-  page: number | null
-  score: number
-  text: string
-}
-
 export interface DocMessage {
   id: string
   role: 'user' | 'ai'
   content: string
   sources?: SourceChunk[]
+  streaming?: boolean
 }
 
 export type UploadStatus = 'indexed' | 'processing' | 'error'

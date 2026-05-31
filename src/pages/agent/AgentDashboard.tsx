@@ -7,17 +7,19 @@ import { UploadPanel } from '../../components/agent/upload/UploadPanel'
 import { useAgentEnquiries } from '../../hooks/useAgentEnquiries'
 import { useEnquiryDraft } from '../../hooks/useEnquiryDraft'
 import { useFileUpload } from '../../hooks/useFileUpload'
+import { useDocumentSearch } from '../../hooks/useDocumentSearch'
 import type { AgentTab } from '../../types/agent'
 
 export default function AgentDashboard() {
   const [activeTab, setActiveTab] = useState<AgentTab>('enquiry')
   const [selectedEnquiryId, setSelectedEnquiryId] = useState<string | null>(null)
 
-  const { enquiries, isLoading: enquiriesLoading, error: enquiriesError, updateEnquiryStatus } = useAgentEnquiries()
+  const { enquiries, isLoading: enquiriesLoading, error: enquiriesError, refetch: refetchEnquiries, updateEnquiryStatus } = useAgentEnquiries()
   const fileUpload = useFileUpload()
 
   const selectedEnquiry = enquiries.find(e => e.id === selectedEnquiryId) ?? null
-  const enquiryDraft = useEnquiryDraft(selectedEnquiry, updateEnquiryStatus) // onStatusChange
+  const docSearch = useDocumentSearch(selectedEnquiry?.propertyId ?? null)
+  const enquiryDraft = useEnquiryDraft(selectedEnquiry, updateEnquiryStatus)
 
   return (
     <div className="min-h-screen md:h-screen md:overflow-hidden bg-slate-100 dark:bg-slate-900 flex flex-col">
@@ -30,6 +32,7 @@ export default function AgentDashboard() {
             enquiries={enquiries}
             enquiriesLoading={enquiriesLoading}
             enquiriesError={enquiriesError}
+            onRetryEnquiries={refetchEnquiries}
             selectedEnquiryId={selectedEnquiryId}
             onSelectEnquiry={setSelectedEnquiryId}
             uploads={fileUpload.uploads}
@@ -41,9 +44,18 @@ export default function AgentDashboard() {
                 key={selectedEnquiryId}
                 enquiry={selectedEnquiry}
                 draft={enquiryDraft}
+                error={enquiriesError}
               />
             )}
-            {activeTab === 'documents' && <DocSearchPanel />}
+            {activeTab === 'documents' && (
+              <DocSearchPanel
+                messages={docSearch.messages}
+                isLoading={docSearch.isLoading}
+                error={docSearch.error}
+                search={docSearch.search}
+                propertyId={selectedEnquiry?.propertyId ?? null}
+              />
+            )}
             {activeTab === 'upload' && (
               <UploadPanel
                 uploads={fileUpload.uploads}

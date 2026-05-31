@@ -33,6 +33,7 @@ interface Props {
   enquiries: Enquiry[]
   enquiriesLoading: boolean
   enquiriesError: string | null
+  onRetryEnquiries: () => void
   selectedEnquiryId: string | null
   onSelectEnquiry: (id: string | null) => void
   uploads: UploadedFile[]
@@ -45,6 +46,7 @@ export function AgentSidebar({
   enquiries,
   enquiriesLoading,
   enquiriesError,
+  onRetryEnquiries,
   selectedEnquiryId,
   onSelectEnquiry,
   uploads,
@@ -138,7 +140,15 @@ export function AgentSidebar({
               )}
 
               {enquiriesError && (
-                <p className="text-xs text-red-500 px-4 py-3">{enquiriesError}</p>
+                <div className="px-4 py-3 flex flex-col gap-1.5">
+                  <p className="text-xs text-red-500">{enquiriesError}</p>
+                  <button
+                    onClick={onRetryEnquiries}
+                    className="self-start text-xs text-indigo-500 dark:text-indigo-400 hover:underline"
+                  >
+                    Try again
+                  </button>
+                </div>
               )}
 
               {!enquiriesLoading && !enquiriesError && filteredEnquiries.length === 0 && (

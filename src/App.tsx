@@ -12,6 +12,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import CopilotPage from "./pages/copilot/CopilotPage";
 import AgentDashboard from "./pages/agent/AgentDashboard";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 
 export default function App() {
@@ -32,8 +33,8 @@ export default function App() {
           {/* Protected pages */}
           <Route element={<AuthGuard><Outlet /></AuthGuard>}>
             <Route path="/assistant" element={<AssistantPage />} />
-            <Route path="/copilot" element={<CopilotPage />} />
-            <Route path="/agent" element={<AgentDashboard />} />
+            <Route path="/copilot" element={<ErrorBoundary><CopilotPage /></ErrorBoundary>} />
+            <Route path="/agent" element={<ErrorBoundary><AgentDashboard /></ErrorBoundary>} />
             <Route path="/deposit/success" element={<DepositSuccessPage />} />
             <Route path="/deposit/cancel" element={<DepositCancelPage />} />
           </Route>

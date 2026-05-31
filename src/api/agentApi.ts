@@ -1,6 +1,7 @@
 import { api } from '../services/apiClient'
 import type {
   ApiEnquiry,
+  ApiEnquiryDraft,
   Enquiry,
   EnquiryAiRequest,
   EnquiryDraft,
@@ -9,6 +10,15 @@ import type {
   IndexedDocument,
   UploadedFile,
 } from '../types/agent'
+
+export function mapSourceChunk(raw: { fileName?: string; file_name?: string; page: number | null; score: number; text: string }) {
+  return {
+    fileName: raw.fileName ?? raw.file_name ?? '',
+    page: raw.page,
+    score: raw.score,
+    text: raw.text,
+  }
+}
 
 const STATUS_MAP: Record<string, EnquiryStatus> = {
   // string enum (JsonStringEnumConverter)
@@ -34,6 +44,7 @@ function mapEnquiry(e: ApiEnquiry): Enquiry {
     status: STATUS_MAP[String(e.status).toLowerCase()] ?? 'new',
     propertyId: e.propertyId,
     draftReply: e.draftReply,
+    draftSources: (e.draftSources ?? []).map(mapSourceChunk),
     sentReply: e.sentReply,
   }
 }
@@ -46,8 +57,8 @@ export async function fetchAgentEnquiries(): Promise<Enquiry[]> {
 
 // POST /ai/enquiry-draft — called when an enquiry is selected (no existing draft)
 export async function generateEnquiryDraft(req: EnquiryAiRequest): Promise<EnquiryDraft> {
-  const { data } = await api.post<EnquiryDraft>('/ai/enquiry-draft', req)
-  return data
+  const { data } = await api.post<ApiEnquiryDraft>('/ai/enquiry-draft', req)
+  return { draft: data.draft, sources: data.draftSources.map(mapSourceChunk), status: data.status }
 }
 
 // POST /enquiries/{id}/send — sends the stored draft reply

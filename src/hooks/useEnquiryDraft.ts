@@ -37,7 +37,7 @@ export function useEnquiryDraft(
         const mapped = STATUS_MAP[data.status?.toLowerCase()] ?? 'drafted'
         onStatusChange?.(enq.id, mapped)
       })
-      .catch(() => setError('Failed to generate draft reply.'))
+      .catch(() => setError('Something went wrong. Please try again.'))
       .finally(() => setIsLoading(false))
   }
 
@@ -64,15 +64,19 @@ export function useEnquiryDraft(
       return
     }
 
+    setDraft(null)
+    setError(null)
+    setSendError(null)
+
     // sentReply → already sent, show read-only
     if (enquiry.sentReply) {
-      setDraft({ draft: enquiry.sentReply, sources: [], status: 'Replied' })
+      setDraft({ draft: enquiry.sentReply, sources: enquiry.draftSources, status: 'Replied' })
       return
     }
 
     // draftReply → show editable draft (no API call)
     if (enquiry.draftReply) {
-      setDraft({ draft: enquiry.draftReply, sources: [], status: 'Drafted' })
+      setDraft({ draft: enquiry.draftReply, sources: enquiry.draftSources, status: 'Drafted' })
       return
     }
 

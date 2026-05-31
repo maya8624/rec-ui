@@ -1,29 +1,55 @@
 import { useState, useCallback } from 'react'
-import { sendChatmessage } from '../api/copilotApi'
+import { streamChatMessage } from '../api/copilotApi'
+import { mapSourceChunk } from '../api/agentApi'
 import type { DocMessage } from '../types/agent'
 
-export function useDocumentSearch() {
+export function useDocumentSearch(propertyId: string | null) {
   const [messages, setMessages] = useState<DocMessage[]>([])
-  const [isLoading, setIsLoading] = useState(false)
+  const [isStreaming, setIsStreaming] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const search = useCallback(async (query: string) => {
-    if (isLoading || !query.trim()) return
-    setMessages(prev => [...prev, { id: crypto.randomUUID(), role: 'user', content: query }])
-    setIsLoading(true)
+    if (isStreaming || !query.trim()) return
+
+    const aiId = crypto.randomUUID()
+    setMessages(prev => [
+      ...prev,
+      { id: crypto.randomUUID(), role: 'user', content: query },
+      { id: aiId, role: 'ai', content: '', streaming: true },
+    ])
+    setIsStreaming(true)
     setError(null)
+
     try {
-      const res = await sendChatmessage({ message: query, propertyId: null, threadId: null })
-      setMessages(prev => [
-        ...prev,
-        { id: crypto.randomUUID(), role: 'ai', content: res.reply, sources: res.sources ?? [] },
-      ])
+      await streamChatMessage(
+        { message: query, propertyId, threadId: null, metadata: { intent: 'document_query' } },
+        (event) => {
+          if (event.type === 'token') {
+            setMessages(prev =>
+              prev.map(m => m.id === aiId ? { ...m, content: m.content + event.content } : m)
+            )
+          } else if (event.type === 'result' && event.sources?.length) {
+            const sources = event.sources.map(mapSourceChunk)
+            setMessages(prev =>
+              prev.map(m => m.id === aiId ? { ...m, sources } : m)
+            )
+          } else if (event.type === 'error') {
+            setMessages(prev =>
+              prev.map(m => m.id === aiId ? { ...m, content: event.message } : m)
+            )
+          }
+        },
+      )
     } catch {
       setError('Search failed. Please try again.')
+      setMessages(prev => prev.filter(m => m.id !== aiId))
     } finally {
-      setIsLoading(false)
+      setMessages(prev =>
+        prev.map(m => m.id === aiId ? { ...m, streaming: false } : m)
+      )
+      setIsStreaming(false)
     }
-  }, [isLoading])
+  }, [isStreaming, propertyId])
 
-  return { messages, isLoading, error, search }
+  return { messages, isLoading: isStreaming, error, search }
 }

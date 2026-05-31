@@ -14,6 +14,7 @@ const baseApiEnquiry: ApiEnquiry = {
   agentId: 'agent-456',
   body: 'I have a question about the water bill.',
   draftReply: null,
+  draftSources: [],
   sentReply: null,
   status: 'New',
   senderName: 'Sarah Chen',
@@ -132,13 +133,13 @@ describe('generateEnquiryDraft', () => {
   beforeEach(() => { vi.clearAllMocks() })
 
   it('calls POST /ai/enquiry-draft with the enquiry id', async () => {
-    const mockDraft = { draft: 'Generated reply', sources: ['Source A'], status: 'Drafted' }
-    ;(api.post as Mock).mockResolvedValue({ data: mockDraft })
+    const mockApiDraft = { draft: 'Generated reply', draftSources: [], status: 'Drafted' }
+    ;(api.post as Mock).mockResolvedValue({ data: mockApiDraft })
 
     const result = await generateEnquiryDraft({ id: 'enq-abc' })
 
     expect(api.post).toHaveBeenCalledWith('/ai/enquiry-draft', { id: 'enq-abc' })
-    expect(result).toEqual(mockDraft)
+    expect(result).toEqual({ draft: 'Generated reply', sources: [], status: 'Drafted' })
   })
 
   it('propagates API errors', async () => {

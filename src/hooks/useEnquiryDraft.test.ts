@@ -20,6 +20,7 @@ function makeEnquiry(overrides: Partial<Enquiry> = {}): Enquiry {
     status: 'new',
     propertyId: 'prop-1',
     draftReply: null,
+    draftSources: [],
     sentReply: null,
     ...overrides,
   }

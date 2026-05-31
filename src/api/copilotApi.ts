@@ -26,7 +26,7 @@ export type StreamEvent =
   | { type: 'token'; content: string }
   | { type: 'tool_start'; tool: string }
   | { type: 'tool_end'; tool: string }
-  | { type: 'result'; thread_id: string | null; listings: StreamListing[]; property_id: string | null; suburb_summary: StreamSuburbSummary | null }
+  | { type: 'result'; thread_id: string | null; listings: StreamListing[]; property_id: string | null; suburb_summary: StreamSuburbSummary | null; sources?: import('../types/agent').SourceChunk[] }
   | { type: 'error'; message: string }
   | { type: 'done' };
 

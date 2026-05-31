@@ -21,19 +21,26 @@ export function useCopilotChat() {
       userText.toLowerCase().includes(k.toLowerCase())
     )
     const responseText = responseOverride ?? (matchKey ? actionResponses[matchKey] : 'Let me look into that for you.')
-    await streamMessage(
-      responseText,
-      (chunk) =>
-        setMessages(prev =>
-          prev.map(m => (m.id === aiId ? { ...m, text: m.text + chunk } : m))
-        ),
-      () => {
-        setMessages(prev =>
-          prev.map(m => (m.id === aiId ? { ...m, streaming: false } : m))
-        )
-        setIsStreaming(false)
-      }
-    )
+    try {
+      await streamMessage(
+        responseText,
+        (chunk) =>
+          setMessages(prev =>
+            prev.map(m => (m.id === aiId ? { ...m, text: m.text + chunk } : m))
+          ),
+        () => {
+          setMessages(prev =>
+            prev.map(m => (m.id === aiId ? { ...m, streaming: false } : m))
+          )
+          setIsStreaming(false)
+        }
+      )
+    } catch {
+      setMessages(prev =>
+        prev.map(m => m.id === aiId ? { ...m, text: 'Something went wrong. Please try again.', streaming: false } : m)
+      )
+      setIsStreaming(false)
+    }
   }
 
   function handleAction(label: string) {

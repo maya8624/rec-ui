@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Send, RefreshCw } from 'lucide-react'
+import { Send, RefreshCw, AlertTriangle } from 'lucide-react'
 import { WorkflowFooter } from '../layout/WorkflowFooter'
 import { enquiryWorkflowSteps } from '../../../data/agent/demoData'
 import type { UseEnquiryDraftReturn } from '../../../hooks/useEnquiryDraft'
@@ -21,14 +21,31 @@ function formatTime(ts: string) {
 interface Props {
   enquiry: Enquiry | null
   draft: UseEnquiryDraftReturn
+  error?: string | null
 }
 
-export function EnquiryDetail({ enquiry, draft }: Props) {
+export function EnquiryDetail({ enquiry, draft, error }: Props) {
   const [editedDraft, setEditedDraft] = useState<string | null>(null)
 
   const draftText = editedDraft ?? draft.draft?.draft ?? ''
 
   if (!enquiry) {
+    if (error) {
+      return (
+        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm flex flex-col items-center justify-center gap-3 h-[200px] md:flex-1 md:min-h-0 text-center px-6">
+          <AlertTriangle className="w-8 h-8 text-amber-500 flex-shrink-0" />
+          <p className="text-sm font-medium text-slate-700 dark:text-slate-200">Failed to load enquiries</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-1 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+          >
+            Reload page
+          </button>
+        </div>
+      )
+    }
+
     return (
       <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm flex items-center justify-center h-[200px] md:flex-1 md:min-h-0 text-slate-400 dark:text-slate-500 text-sm">
         Select an enquiry from the queue
@@ -96,9 +113,9 @@ export function EnquiryDetail({ enquiry, draft }: Props) {
                 <div className="px-4 pb-3 border-t border-slate-200 dark:border-slate-700 pt-3 flex-shrink-0">
                   <p className="text-xs text-slate-400 dark:text-slate-500 mb-1.5">Context sources</p>
                   <div className="flex flex-wrap gap-1.5">
-                    {draft.draft.sources.map((chunk, i) => (
-                      <span key={i} className="text-xs px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400">
-                        {chunk.fileName}
+                    {[...new Set(draft.draft.sources.map(s => s.fileName))].map(name => (
+                      <span key={name} className="text-xs px-2.5 py-0.5 rounded-full bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/30">
+                        {name}
                       </span>
                     ))}
                   </div>
