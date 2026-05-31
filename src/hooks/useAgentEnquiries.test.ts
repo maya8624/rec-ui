@@ -17,6 +17,7 @@ const mockEnquiries: Enquiry[] = [
     status: 'new',
     propertyId: 'prop-1',
     draftReply: null,
+    draftSources: [],
     sentReply: null,
   },
   {
@@ -29,6 +30,7 @@ const mockEnquiries: Enquiry[] = [
     status: 'drafted',
     propertyId: 'prop-2',
     draftReply: 'Dear James, the inspection is on...',
+    draftSources: [],
     sentReply: null,
   },
 ]

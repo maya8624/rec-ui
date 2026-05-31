@@ -1,5 +1,68 @@
 export type UserRole = "buyer" | "seller" | "agent";
 
+export interface ListingItem {
+  propertyId: string
+  listingId: string
+  listingType: string
+  listingStatus: string
+  price: number
+  bedrooms: number
+  bathrooms: number
+  carSpaces: number
+  petFriendly: boolean
+  propertyType: string
+  address: string
+  suburb: string
+  state: string
+  postcode: string
+  agentName: string
+  agentPhone: string
+  agencyName: string
+  propertyUrl: string | null
+  imageUrl: string | null
+}
+
+export interface WorkflowStep {
+  status: 'done' | 'pending' | 'waiting'
+  label: string
+  detail?: string
+}
+
+export interface SuburbProfile {
+  name: string
+  description: string
+  rents: {
+    oneBedroom: string | null
+    twoBedroom: string | null
+    threeBedroom: string | null
+  }
+  vacancyRate: string | null
+  trend: string | null
+}
+
+export interface SuburbSummaryResponse {
+  suburbs: SuburbProfile[]
+}
+
+export interface CopilotMessage {
+  id: string
+  role: 'user' | 'ai'
+  text: string
+  streaming?: boolean
+  type?: 'suburb-summary'
+  suburbSummary?: SuburbSummaryResponse
+  listings?: ListingItem[]
+}
+
+export interface PreferenceRequest {
+  suburbs: string[]
+  maxRent: number
+  minBeds: number
+  maxBeds: number
+  petFriendly: boolean
+  availableWithinDays: number
+}
+
 export type Message = {
   role: "user" | "assistant";
   content: string;
