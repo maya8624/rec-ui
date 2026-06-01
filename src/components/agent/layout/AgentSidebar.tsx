@@ -38,6 +38,7 @@ interface Props {
   onSelectEnquiry: (id: string | null) => void
   uploads: UploadedFile[]
   isGenerating: boolean
+  selectedPropertyId: string | null
 }
 
 export function AgentSidebar({
@@ -51,6 +52,7 @@ export function AgentSidebar({
   onSelectEnquiry,
   uploads,
   isGenerating,
+  selectedPropertyId,
 }: Props) {
   const [statusFilter, setStatusFilter] = useState<EnquiryStatus | 'all'>('all')
 
@@ -168,7 +170,7 @@ export function AgentSidebar({
             </>
           )}
 
-          {activeTab === 'documents' && <DocumentList />}
+          {activeTab === 'documents' && <DocumentList propertyId={selectedPropertyId} />}
           {activeTab === 'upload' && <RecentUploadsSidebar uploads={uploads} />}
         </div>
       </div>

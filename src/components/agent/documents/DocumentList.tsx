@@ -8,7 +8,11 @@ function DocIcon({ type }: { type: DocType }) {
   return <AlignLeft className="w-3 h-3 text-slate-400 dark:text-slate-500 flex-shrink-0" />
 }
 
-export function DocumentList() {
+interface Props {
+  propertyId: string | null
+}
+
+export function DocumentList({ propertyId }: Props) {
   const docs: IndexedDocument[] = []
 
   return (
@@ -34,7 +38,8 @@ export function DocumentList() {
           {[
             { label: 'Embed model', value: ragContextInfo.embedModel },
             { label: 'Index type', value: ragContextInfo.indexType },
-            { label: 'Tenant', value: ragContextInfo.tenant },
+            { label: 'Agency', value: ragContextInfo.tenant },
+            { label: 'Property ID', value: propertyId ?? '—' },
           ].map(row => (
             <div key={row.label} className="flex justify-between gap-2 text-xs">
               <span className="text-slate-400 dark:text-slate-500">{row.label}</span>

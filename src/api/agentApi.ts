@@ -58,7 +58,7 @@ export async function fetchAgentEnquiries(): Promise<Enquiry[]> {
 // POST /ai/enquiry-draft — called when an enquiry is selected (no existing draft)
 export async function generateEnquiryDraft(req: EnquiryAiRequest): Promise<EnquiryDraft> {
   const { data } = await api.post<ApiEnquiryDraft>('/ai/enquiry-draft', req)
-  return { draft: data.draft, sources: data.draftSources.map(mapSourceChunk), status: data.status }
+  return { draft: data.draft, sources: (data.sources ?? []).map(mapSourceChunk), status: data.status }
 }
 
 // POST /enquiries/{id}/send — sends the stored draft reply

@@ -53,7 +53,7 @@ export interface EnquirySendResponse {
 // Raw shape from POST /ai/enquiry-draft
 export interface ApiEnquiryDraft {
   draft: string
-  draftSources: SourceChunk[]
+  sources: SourceChunk[]
   status: string
 }
 

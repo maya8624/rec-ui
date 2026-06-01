@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Send, Lock } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { docSearchSuggestions } from '../../../data/agent/demoData'
 import type { DocMessage, SourceChunk } from '../../../types/agent'
 
@@ -62,9 +64,18 @@ export function DocSearchPanel({ messages, isLoading, error, search, propertyId 
                     <span className="w-2 h-2 bg-slate-400 dark:bg-slate-500 rounded-full animate-bounce [animation-delay:300ms]" />
                   </div>
                 ) : (
-                  <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                    {msg.content}
-                  </p>
+                  <div className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                        strong: ({ children }) => <strong className="font-semibold text-slate-800 dark:text-slate-100">{children}</strong>,
+                        ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-0.5">{children}</ul>,
+                        ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-0.5">{children}</ol>,
+                        li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+                      }}
+                    >{msg.content}</ReactMarkdown>
+                  </div>
                 )}
                 {msg.sources && msg.sources.length > 0 && (
                   <>

@@ -37,6 +37,7 @@ export default function AgentDashboard() {
             onSelectEnquiry={setSelectedEnquiryId}
             uploads={fileUpload.uploads}
             isGenerating={enquiryDraft.isLoading}
+            selectedPropertyId={selectedEnquiry?.propertyId ?? null}
           />
           <div className="md:flex-1 md:min-h-0 md:flex md:flex-col md:border-l md:border-slate-200 dark:md:border-slate-700 md:pl-4">
             {activeTab === 'enquiry' && (

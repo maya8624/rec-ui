@@ -103,7 +103,7 @@ export function EnquiryDetail({ enquiry, draft, error }: Props) {
           {!draft.isLoading && draft.draft && (
             <>
               <textarea
-                className="w-full bg-white dark:bg-slate-800 text-sm text-slate-700 dark:text-slate-300 p-4 resize-none leading-relaxed focus:outline-none flex-1 min-h-[160px] scrollbar-none"
+                className="w-full bg-white dark:bg-slate-800 text-sm text-slate-700 dark:text-slate-300 p-4 resize-none leading-relaxed focus:outline-none flex-1 min-h-[160px] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-200 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700"
                 value={draftText}
                 onChange={e => setEditedDraft(e.target.value)}
                 disabled={draft.isReadOnly || draft.isSending}

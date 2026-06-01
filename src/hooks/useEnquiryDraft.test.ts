@@ -110,7 +110,7 @@ describe('useEnquiryDraft', () => {
       const enquiry = makeEnquiry({ status: 'new' })
       const { result } = renderHook(() => useEnquiryDraft(enquiry))
       await act(async () => {})
-      expect(result.current.error).toBe('Failed to generate draft reply.')
+      expect(result.current.error).toBe('Something went wrong. Please try again.')
       expect(result.current.isLoading).toBe(false)
       expect(result.current.draft).toBeNull()
     })

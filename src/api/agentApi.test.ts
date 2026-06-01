@@ -133,7 +133,7 @@ describe('generateEnquiryDraft', () => {
   beforeEach(() => { vi.clearAllMocks() })
 
   it('calls POST /ai/enquiry-draft with the enquiry id', async () => {
-    const mockApiDraft = { draft: 'Generated reply', draftSources: [], status: 'Drafted' }
+    const mockApiDraft = { draft: 'Generated reply', sources: [], status: 'Drafted' }
     ;(api.post as Mock).mockResolvedValue({ data: mockApiDraft })
 
     const result = await generateEnquiryDraft({ id: 'enq-abc' })
