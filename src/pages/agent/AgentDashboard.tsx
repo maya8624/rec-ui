@@ -50,6 +50,7 @@ export default function AgentDashboard() {
             )}
             {activeTab === 'documents' && (
               <DocSearchPanel
+                key={selectedEnquiry?.propertyId ?? 'none'}
                 messages={docSearch.messages}
                 isLoading={docSearch.isLoading}
                 error={docSearch.error}

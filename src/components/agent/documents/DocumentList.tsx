@@ -36,7 +36,7 @@ export function DocumentList({ propertyId }: Props) {
         <p className="text-xs text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">RAG Context</p>
         <div className="space-y-1.5">
           {[
-            { label: 'Embed model', value: ragContextInfo.embedModel },
+            { label: 'Embed model', value: 'text-embedding-3-small' },
             { label: 'Index type', value: ragContextInfo.indexType },
             { label: 'Agency', value: ragContextInfo.tenant },
             { label: 'Property ID', value: propertyId ?? '—' },
