@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { streamChatMessage } from '../api/copilotApi'
 import { mapSourceChunk } from '../api/agentApi'
 import type { DocMessage } from '../types/agent'
@@ -7,6 +7,11 @@ export function useDocumentSearch(propertyId: string | null) {
   const [messages, setMessages] = useState<DocMessage[]>([])
   const [isStreaming, setIsStreaming] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    setMessages([])
+    setError(null)
+  }, [propertyId])
 
   const search = useCallback(async (query: string) => {
     if (isStreaming || !query.trim()) return

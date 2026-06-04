@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { Send, Lock } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -28,10 +28,18 @@ interface DocSearchPanelProps {
 export function DocSearchPanel({ messages, isLoading, error, search, propertyId }: DocSearchPanelProps) {
   const [input, setInput] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  useEffect(() => {
+    const el = textareaRef.current
+    if (!el) return
+    el.style.height = 'auto'
+    el.style.height = `${el.scrollHeight}px`
+  }, [input])
 
   function handleSend() {
     if (!input.trim() || isLoading) return
@@ -39,9 +47,9 @@ export function DocSearchPanel({ messages, isLoading, error, search, propertyId 
     setInput('')
   }
 
-  function handleKey(e: React.KeyboardEvent<HTMLInputElement>) {
+  const handleKey = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() }
-  }
+  }, [input, isLoading])
 
   return (
     <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm flex flex-col flex-1 min-h-0">
@@ -125,9 +133,11 @@ export function DocSearchPanel({ messages, isLoading, error, search, propertyId 
                 ))}
               </div>
             )}
-            <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 focus-within:border-indigo-300 dark:focus-within:border-indigo-500/50 transition-colors">
-              <input
-                className="flex-1 bg-transparent text-sm text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none"
+            <div className="flex items-end gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-3 focus-within:border-indigo-300 dark:focus-within:border-indigo-500/50 transition-colors">
+              <textarea
+                ref={textareaRef}
+                rows={1}
+                className="flex-1 bg-transparent text-sm text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none resize-none overflow-hidden leading-5 max-h-40"
                 placeholder="Ask about a document, clause, or tenant…"
                 value={input}
                 onChange={e => setInput(e.target.value)}
@@ -137,7 +147,7 @@ export function DocSearchPanel({ messages, isLoading, error, search, propertyId 
               <button
                 onClick={handleSend}
                 disabled={isLoading || !input.trim()}
-                className="w-7 h-7 rounded-lg bg-gold flex items-center justify-center disabled:opacity-40 hover:opacity-90 transition-opacity"
+                className="w-7 h-7 flex-shrink-0 rounded-lg bg-gold flex items-center justify-center disabled:opacity-40 hover:opacity-90 transition-opacity"
               >
                 <Send className="w-3.5 h-3.5 text-navy-900" />
               </button>
