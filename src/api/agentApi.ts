@@ -8,7 +8,6 @@ import type {
   EnquiryStatus,
   EnquirySendResponse,
   IndexedDocument,
-  UploadedFile,
 } from '../types/agent'
 
 export function mapSourceChunk(raw: { fileName?: string; file_name?: string; page: number | null; score: number; text: string }) {
@@ -72,16 +71,7 @@ export async function fetchDocuments(): Promise<IndexedDocument[]> {
   return data
 }
 
-export async function uploadDocument(file: File): Promise<{ id: string }> {
-  const form = new FormData()
-  form.append('file', file)
-  const { data } = await api.post<{ id: string }>('/agent/documents/upload', form, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  })
-  return data
-}
-
-export async function fetchUploadStatus(id: string): Promise<UploadedFile> {
-  const { data } = await api.get<UploadedFile>(`/agent/documents/upload-status/${id}`)
+export async function getUploadUrl(req: { fileName: string; contentType: string }): Promise<{ sasUrl: string; blobName: string }> {
+  const { data } = await api.post<{ sasUrl: string; blobName: string }>('/files/upload-url', req)
   return data
 }

@@ -1,44 +1,61 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
-import { uploadDocument, fetchUploadStatus } from '../api/agentApi'
+import { useState, useCallback, useRef } from 'react'
+import { BlockBlobClient } from '@azure/storage-blob'
+import { getUploadUrl } from '../api/agentApi'
 import type { UploadedFile } from '../types/agent'
 
-const MAX_FILE_MB = 20
+const MAX_FILE_MB = 100
+const MAX_FILES = 5
 const ALLOWED_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
   'application/pdf',
+  'application/msword',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'text/plain',
 ]
 
 export function useFileUpload() {
   const [uploads, setUploads] = useState<UploadedFile[]>([])
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const pollRefs = useRef<Record<string, ReturnType<typeof setInterval>>>({})
+  const queueRef = useRef<Array<{ file: File; tempId: string }>>([])
+  const processingRef = useRef(false)
 
-  useEffect(() => {
-    return () => { Object.values(pollRefs.current).forEach(clearInterval) }
-  }, [])
+  async function processNext() {
+    if (processingRef.current || queueRef.current.length === 0) return
+    const { file, tempId } = queueRef.current.shift()!
+    processingRef.current = true
 
-  function startPolling(id: string) {
-    pollRefs.current[id] = setInterval(async () => {
-      try {
-        const updated = await fetchUploadStatus(id)
-        setUploads(prev => prev.map(u => u.id === id ? updated : u))
-        if (updated.status !== 'processing') {
-          clearInterval(pollRefs.current[id])
-          delete pollRefs.current[id]
-        }
-      } catch {
-        clearInterval(pollRefs.current[id])
-        delete pollRefs.current[id]
-      }
-    }, 3000)
+    try {
+      const { sasUrl, blobName } = await getUploadUrl({ fileName: file.name, contentType: file.type })
+      const client = new BlockBlobClient(sasUrl)
+      await client.uploadData(file, {
+        blobHTTPHeaders: { blobContentType: file.type },
+        onProgress: (e) => {
+          const progress = Math.round((e.loadedBytes / file.size) * 100)
+          setUploads(prev => prev.map(u => u.id === tempId ? { ...u, progress } : u))
+        },
+      })
+      setUploads(prev => prev.map(u =>
+        u.id === tempId ? { ...u, status: 'uploaded', progress: 100, blobName } : u
+      ))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Upload failed. Please try again.')
+      setUploads(prev => prev.map(u =>
+        u.id === tempId ? { ...u, status: 'error' } : u
+      ))
+    } finally {
+      processingRef.current = false
+      if (queueRef.current.length === 0) setIsUploading(false)
+      processNext()
+    }
   }
 
-  const upload = useCallback(async (file: File) => {
-    if (isUploading) return
+  const upload = useCallback((file: File) => {
+    setError(null)
+
     if (!ALLOWED_TYPES.includes(file.type)) {
-      setError('Only PDF, DOCX, and TXT files are allowed.')
+      setError('Only JPEG, PNG, WebP, PDF, and Word documents are allowed.')
       return
     }
     const sizeMb = file.size / 1_048_576
@@ -46,24 +63,20 @@ export function useFileUpload() {
       setError(`File too large. Maximum size is ${MAX_FILE_MB} MB.`)
       return
     }
-    setError(null)
-    setIsUploading(true)
-    const tempId = `temp-${Date.now()}`
+    if (uploads.length >= MAX_FILES) {
+      setError(`You can upload a maximum of ${MAX_FILES} files.`)
+      return
+    }
+
+    const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`
+    queueRef.current.push({ file, tempId })
     setUploads(prev => [
-      { id: tempId, filename: file.name, sizeMb: parseFloat(sizeMb.toFixed(1)), status: 'processing', uploadedAt: new Date().toISOString() },
+      { id: tempId, filename: file.name, sizeMb: parseFloat(sizeMb.toFixed(1)), status: 'uploading', progress: 0, blobName: null, uploadedAt: new Date().toISOString() },
       ...prev,
     ])
-    try {
-      const { id } = await uploadDocument(file)
-      setUploads(prev => prev.map(u => u.id === tempId ? { ...u, id } : u))
-      startPolling(id)
-    } catch {
-      setError('Upload failed. Please try again.')
-      setUploads(prev => prev.filter(u => u.id !== tempId))
-    } finally {
-      setIsUploading(false)
-    }
-  }, [isUploading])
+    setIsUploading(true)
+    processNext()
+  }, [uploads])
 
   return { uploads, isUploading, error, upload }
 }

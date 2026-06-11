@@ -1,8 +1,8 @@
 import type { UploadedFile, UploadStatus } from '../../../types/agent'
 
 function statusText(status: UploadStatus) {
-  if (status === 'indexed') return <span className="text-emerald-600 dark:text-emerald-400">Indexed</span>
-  if (status === 'processing') return <span className="text-amber-500 dark:text-amber-400 animate-pulse">Processing</span>
+  if (status === 'uploaded') return <span className="text-emerald-600 dark:text-emerald-400">Uploaded</span>
+  if (status === 'uploading') return <span className="text-amber-500 dark:text-amber-400 animate-pulse">Uploading</span>
   return <span className="text-red-500 dark:text-red-400">Error</span>
 }
 

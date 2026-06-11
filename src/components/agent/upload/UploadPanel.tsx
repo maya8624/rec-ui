@@ -5,14 +5,14 @@ import { uploadWorkflowSteps } from '../../../data/agent/demoData'
 import type { UploadedFile, UploadStatus } from '../../../types/agent'
 
 function StatusIcon({ status }: { status: UploadStatus }) {
-  if (status === 'indexed') return <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-  if (status === 'processing') return <Loader2 className="w-4 h-4 text-amber-500 animate-spin flex-shrink-0" />
+  if (status === 'uploaded') return <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+  if (status === 'uploading') return <Loader2 className="w-4 h-4 text-amber-500 animate-spin flex-shrink-0" />
   return <XCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
 }
 
 function statusLabelClass(status: UploadStatus) {
-  if (status === 'indexed') return 'text-emerald-600 dark:text-emerald-400'
-  if (status === 'processing') return 'text-amber-500 dark:text-amber-400'
+  if (status === 'uploaded') return 'text-emerald-600 dark:text-emerald-400'
+  if (status === 'uploading') return 'text-amber-500 dark:text-amber-400'
   return 'text-red-500 dark:text-red-400'
 }
 
@@ -63,7 +63,7 @@ export function UploadPanel({ uploads, isUploading, error, onUpload }: Props) {
               : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-500 hover:bg-slate-50 dark:hover:bg-slate-900 cursor-pointer'
           }`}
         >
-          <input ref={inputRef} type="file" className="hidden" accept=".pdf,.docx,.txt" onChange={handleChange} />
+          <input ref={inputRef} type="file" className="hidden" accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx" onChange={handleChange} />
           {isUploading
             ? <Loader2 className="w-9 h-9 text-gold animate-spin" />
             : <Upload className={`w-9 h-9 ${isDragging ? 'text-gold' : 'text-slate-400 dark:text-slate-500'}`} />
@@ -72,7 +72,7 @@ export function UploadPanel({ uploads, isUploading, error, onUpload }: Props) {
             <p className="text-sm text-slate-600 dark:text-slate-300">
               {isUploading ? 'Uploading…' : 'Drop file here or click to browse'}
             </p>
-            <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">PDF, DOCX, TXT · max 20 MB</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">JPEG, PNG, WebP, PDF, Word · max 100 MB · up to 5 files</p>
           </div>
         </div>
 
@@ -92,9 +92,17 @@ export function UploadPanel({ uploads, isUploading, error, onUpload }: Props) {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-slate-700 dark:text-slate-300 truncate">{u.filename}</p>
                     <p className="text-xs text-slate-400 dark:text-slate-500">{u.sizeMb} MB · {formatTime(u.uploadedAt)}</p>
+                    {u.status === 'uploading' && (
+                      <div className="mt-1.5 h-1 w-full rounded-full bg-slate-200 dark:bg-slate-700">
+                        <div
+                          className="h-1 rounded-full bg-amber-400 transition-all duration-300"
+                          style={{ width: `${u.progress}%` }}
+                        />
+                      </div>
+                    )}
                   </div>
                   <span className={`text-xs capitalize flex-shrink-0 ${statusLabelClass(u.status)}`}>
-                    {u.status}
+                    {u.status === 'uploading' ? `${u.progress}%` : u.status === 'uploaded' ? 'Uploaded' : 'Error'}
                   </span>
                 </div>
               ))}

@@ -87,13 +87,15 @@ export interface DocMessage {
   streaming?: boolean
 }
 
-export type UploadStatus = 'indexed' | 'processing' | 'error'
+export type UploadStatus = 'uploaded' | 'uploading' | 'error'
 
 export interface UploadedFile {
   id: string
   filename: string
   sizeMb: number
   status: UploadStatus
+  progress: number
+  blobName: string | null
   uploadedAt: string
 }
 
