@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react'
 import { BlockBlobClient } from '@azure/storage-blob'
-import { getUploadUrl } from '../api/agentApi'
+import { getUploadUrl, confirmUpload } from '../api/agentApi'
 import type { UploadedFile } from '../types/agent'
 
 const MAX_FILE_MB = 100
@@ -27,7 +27,8 @@ export function useFileUpload() {
     processingRef.current = true
 
     try {
-      const { sasUrl, blobName } = await getUploadUrl({ fileName: file.name, contentType: file.type })
+      const { fileUploadId, sasUrl, blobName } = await getUploadUrl({ fileName: file.name, contentType: file.type, purpose: 'Ingestion' })
+      setUploads(prev => prev.map(u => u.id === tempId ? { ...u, fileUploadId } : u))
       const client = new BlockBlobClient(sasUrl)
       await client.uploadData(file, {
         blobHTTPHeaders: { blobContentType: file.type },
@@ -36,6 +37,7 @@ export function useFileUpload() {
           setUploads(prev => prev.map(u => u.id === tempId ? { ...u, progress } : u))
         },
       })
+      await confirmUpload(fileUploadId, file.size)
       setUploads(prev => prev.map(u =>
         u.id === tempId ? { ...u, status: 'uploaded', progress: 100, blobName } : u
       ))
@@ -71,7 +73,7 @@ export function useFileUpload() {
     const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`
     queueRef.current.push({ file, tempId })
     setUploads(prev => [
-      { id: tempId, filename: file.name, sizeMb: parseFloat(sizeMb.toFixed(1)), status: 'uploading', progress: 0, blobName: null, uploadedAt: new Date().toISOString() },
+      { id: tempId, fileUploadId: null, filename: file.name, sizeMb: parseFloat(sizeMb.toFixed(1)), status: 'uploading', progress: 0, blobName: null, uploadedAt: new Date().toISOString() },
       ...prev,
     ])
     setIsUploading(true)

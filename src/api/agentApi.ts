@@ -71,7 +71,20 @@ export async function fetchDocuments(): Promise<IndexedDocument[]> {
   return data
 }
 
-export async function getUploadUrl(req: { fileName: string; contentType: string }): Promise<{ sasUrl: string; blobName: string }> {
-  const { data } = await api.post<{ sasUrl: string; blobName: string }>('/files/upload-url', req)
+export type UploadPurpose = 'General' | 'Extraction' | 'Ingestion'
+
+export interface UploadUrlResponse {
+  fileUploadId: string
+  sasUrl: string
+  blobName: string
+  sasExpiresAtUtc: string
+}
+
+export async function getUploadUrl(req: { fileName: string; contentType: string; purpose: UploadPurpose }): Promise<UploadUrlResponse> {
+  const { data } = await api.post<UploadUrlResponse>('/files/upload-url', req)
   return data
+}
+
+export async function confirmUpload(fileUploadId: string, fileSizeBytes?: number): Promise<void> {
+  await api.post(`/files/${fileUploadId}/confirm`, fileSizeBytes !== undefined ? { fileSizeBytes } : {})
 }

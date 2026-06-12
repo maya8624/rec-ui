@@ -91,6 +91,7 @@ export type UploadStatus = 'uploaded' | 'uploading' | 'error'
 
 export interface UploadedFile {
   id: string
+  fileUploadId: string | null
   filename: string
   sizeMb: number
   status: UploadStatus
